@@ -5,22 +5,26 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
 
 const registerUser = asyncHandler(async (req, res) => {
-    const { username, email, fullName, password } = req.body;
+    const { username, email, fullName, password, role } = req.body;
 
     if (!username || !email || !fullName || !password) {
         throw new ApiError(400, "All fields are required");
     }
+
 
     const existingUser = await User.findOne({ $or: [{ email }, { username }] });
     if (existingUser) {
         throw new ApiError(409, "User already exists");
     }
 
+    const allowedRoles = ["user", "admin"];
+    const userRole = allowedRoles.includes(role) ? role : "user";
     const newUser = await User.create({
         username,
         email,
         fullName,
         password,
+        role: userRole
     });
 
     const accessToken = newUser.generateAccessToken();
@@ -58,9 +62,7 @@ const loginUser = asyncHandler(async (req, res) => {
     const { emailOrUsername, password } = req.body;
 
     if (req.cookies?.accessToken) {
-        return res.status(200).json(
-            new ApiResponse(200, null, "User already logged in")
-        );
+        throw new ApiError(400, "User already logged in");
     }
 
     if (!emailOrUsername || !password) {
