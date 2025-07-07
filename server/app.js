@@ -8,7 +8,7 @@ import orderRoutes from "./routes/order.routes.js";
 import paymentRoutes from "./routes/payment.routes.js";
 import razorpayRoutes from "./routes/razorpay.route.js";
 import adminRoutes from "./routes/admin.route.js";
-
+import userRouter from "./routes/user.route.js"
 
 const app = express();
 
@@ -26,6 +26,7 @@ app.use("/api/v1/ingredients", ingredientRoutes);
 app.use("/api/v1/orders", orderRoutes);
 app.use("/api/v1/payments", paymentRoutes);
 app.use("/api/v1/razorpay", razorpayRoutes);
+app.use("/api/v1/users", userRouter);
 
 app.get("/", (req, res) => {
   res.send("🍕 Welcome to the Pizza Delivery API!");
