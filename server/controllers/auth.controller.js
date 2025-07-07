@@ -159,16 +159,15 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 });
 
 const getCurrentUser = asyncHandler(async (req, res) => {
-    const user = await User.findById(req.user._id).select(
-        "-password -refreshToken"
-    );
-    if (!user) {
-        throw new ApiError(404, "User not found");
-    }
+  // Fetch user from DB using ID from JWT payload (set by verifyJWT middleware)
+  const user = await User.findById(req.user._id).select("-password -refreshToken");
 
-    res
-        .status(200)
-        .json(new ApiResponse(200, user, "User fetched successfully"));
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  // Return the user (without sensitive data)
+  res.status(200).json(new ApiResponse(200, user, "User fetched successfully"));
 });
 
 export {

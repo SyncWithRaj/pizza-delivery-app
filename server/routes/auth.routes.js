@@ -14,6 +14,8 @@ router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.post("/logout", logoutUser);
 router.get("/refresh-token", refreshAccessToken);
-router.get("/current-user", verifyJWT, getCurrentUser);
+
+// ✅ Changed to /me for standard convention
+router.get("/me", verifyJWT, getCurrentUser);
 
 export default router;

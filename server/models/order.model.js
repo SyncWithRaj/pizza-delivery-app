@@ -10,7 +10,7 @@ const orderSchema = new Schema(
       {
         type: Schema.Types.ObjectId,
         ref: "Pizza",
-      }
+      },
     ],
     status: {
       type: String,
@@ -25,6 +25,11 @@ const orderSchema = new Schema(
     paymentId: String,
     deliveryAddress: {
       type: String,
+      required: true,
+    },
+
+    totalPrice: {
+      type: Number,
       required: true,
     },
   },
