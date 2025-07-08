@@ -1,6 +1,17 @@
 import { useEffect, useState } from "react";
 import API from "../services/api";
 import { useNavigate } from "react-router-dom";
+import {
+  FaUsers,
+  FaChartLine,
+  FaPizzaSlice,
+  FaClipboardList,
+  FaClock,
+  FaHome,
+  FaTasks,
+  FaBoxes,
+  FaUserShield,
+} from "react-icons/fa";
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState({
@@ -16,7 +27,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await API.get("/admin/stats"); // 👈 Create this route
+        const res = await API.get("/admin/stats");
         setStats(res.data.data);
       } catch (err) {
         console.error(err);
@@ -28,66 +39,87 @@ const AdminDashboard = () => {
   }, []);
 
   const cardStyle =
-    "bg-white p-4 rounded shadow text-center border hover:shadow-lg transition";
+    "bg-white p-6 rounded-xl border shadow-md hover:shadow-xl transition flex items-center gap-4";
+
+  const titleStyle = "text-gray-500 text-sm uppercase";
+  const valueStyle = "text-2xl font-bold text-gray-800";
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
-      <h2 className="text-3xl font-bold mb-6 text-center">🛠️ Admin Dashboard</h2>
+      <h2 className="text-4xl font-extrabold text-center text-red-600 mb-10 flex justify-center items-center gap-2">
+        <FaUserShield /> Admin Dashboard
+      </h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
         <div className={cardStyle}>
-          <h3 className="text-xl font-semibold">Total Orders</h3>
-          <p className="text-2xl">{stats.totalOrders}</p>
+          <FaClipboardList className="text-4xl text-blue-600" />
+          <div>
+            <div className={titleStyle}>Total Orders</div>
+            <div className={valueStyle}>{stats.totalOrders}</div>
+          </div>
         </div>
         <div className={cardStyle}>
-          <h3 className="text-xl font-semibold">Total Revenue</h3>
-          <p className="text-2xl">₹{stats.totalRevenue}</p>
+          <FaChartLine className="text-4xl text-green-600" />
+          <div>
+            <div className={titleStyle}>Total Revenue</div>
+            <div className={valueStyle}>₹{stats.totalRevenue}</div>
+          </div>
         </div>
         <div className={cardStyle}>
-          <h3 className="text-xl font-semibold">Pending Orders</h3>
-          <p className="text-2xl">{stats.pendingOrders}</p>
+          <FaClock className="text-4xl text-yellow-600" />
+          <div>
+            <div className={titleStyle}>Pending Orders</div>
+            <div className={valueStyle}>{stats.pendingOrders}</div>
+          </div>
         </div>
         <div className={cardStyle}>
-          <h3 className="text-xl font-semibold">Total Users</h3>
-          <p className="text-2xl">{stats.totalUsers}</p>
+          <FaUsers className="text-4xl text-purple-600" />
+          <div>
+            <div className={titleStyle}>Total Users</div>
+            <div className={valueStyle}>{stats.totalUsers}</div>
+          </div>
         </div>
         <div className={cardStyle}>
-          <h3 className="text-xl font-semibold">Pizzas in Menu</h3>
-          <p className="text-2xl">{stats.totalPizzas}</p>
+          <FaPizzaSlice className="text-4xl text-red-500" />
+          <div>
+            <div className={titleStyle}>Pizzas in Menu</div>
+            <div className={valueStyle}>{stats.totalPizzas}</div>
+          </div>
         </div>
       </div>
 
       {/* Navigation Buttons */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         <button
           onClick={() => navigate("/admin/orders")}
-          className="bg-green-600 text-white py-2 rounded hover:bg-green-700"
+          className="bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-semibold flex items-center justify-center gap-2"
         >
-          Manage Orders
+          <FaTasks /> Manage Orders
         </button>
         <button
           onClick={() => navigate("/admin/pizzas")}
-          className="bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+          className="bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold flex items-center justify-center gap-2"
         >
-          Manage Pizzas
+          <FaPizzaSlice /> Manage Pizzas
         </button>
         <button
           onClick={() => navigate("/admin/ingredients")}
-          className="bg-yellow-600 text-white py-2 rounded hover:bg-yellow-700"
+          className="bg-yellow-600 hover:bg-yellow-700 text-white py-3 rounded-lg font-semibold flex items-center justify-center gap-2"
         >
-          Manage Ingredients
+          <FaBoxes /> Manage Ingredients
         </button>
         <button
           onClick={() => navigate("/admin/users")}
-          className="bg-purple-600 text-white py-2 rounded hover:bg-purple-700"
+          className="bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg font-semibold flex items-center justify-center gap-2"
         >
-          View Users
+          <FaUsers /> View Users
         </button>
         <button
           onClick={() => navigate("/")}
-          className="bg-gray-700 text-white py-2 rounded hover:bg-gray-800"
+          className="bg-gray-700 hover:bg-gray-800 text-white py-3 rounded-lg font-semibold flex items-center justify-center gap-2"
         >
-          Go to Home
+          <FaHome /> Go to Home
         </button>
       </div>
     </div>

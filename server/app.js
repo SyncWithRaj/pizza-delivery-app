@@ -9,6 +9,7 @@ import paymentRoutes from "./routes/payment.routes.js";
 import razorpayRoutes from "./routes/razorpay.route.js";
 import adminRoutes from "./routes/admin.route.js";
 import userRouter from "./routes/user.route.js"
+import cartRouter from "./routes/cart.route.js";
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/pizzas", pizzaRoutes);
 app.use("/api/v1/ingredients", ingredientRoutes);
 app.use("/api/v1/orders", orderRoutes);
+app.use("/api/v1/cart", cartRouter);
 app.use("/api/v1/payments", paymentRoutes);
 app.use("/api/v1/razorpay", razorpayRoutes);
 app.use("/api/v1/users", userRouter);

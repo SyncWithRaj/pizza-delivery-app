@@ -12,12 +12,15 @@ import AdminOrders from "./pages/AdminOrders";
 import AdminPizzas from "./pages/AdminPizzas";
 import AdminIngredients from "./pages/AdminIngredients";
 import AdminUsers from "./pages/AdminUsers";
-
+import Cart from "./pages/Cart";
+import Navbar from "./components/Navbar";
+import { Toaster } from 'react-hot-toast';
 
 function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
+        <Navbar />
         <Routes>
           <Route path="/logout" element={<Logout />} />
           <Route path="/" element={<Home />} />
@@ -31,8 +34,10 @@ function App() {
           <Route path="/admin/pizzas" element={<AdminPizzas />} />
           <Route path="/admin/ingredients" element={<AdminIngredients />} />
           <Route path="/admin/users" element={<AdminUsers />} />
+          <Route path="/cart" element={<Cart />} />
         </Routes>
       </BrowserRouter>
+      <Toaster position="top-right" reverseOrder={false} />
     </AuthProvider>
   );
 }

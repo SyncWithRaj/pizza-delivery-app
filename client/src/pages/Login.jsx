@@ -10,45 +10,70 @@ const Login = () => {
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await API.post("/auth/login", { emailOrUsername, password });
-      setUser(res.data.data);
+  e.preventDefault();
+  try {
+    const res = await API.post("/auth/login", { emailOrUsername, password });
+    const loggedInUser = res.data.data;
+
+    setUser(loggedInUser);
+
+    // 🔁 Redirect based on role
+    if (loggedInUser.role === "admin") {
+      navigate("/admin");
+    } else {
       navigate("/");
-    } catch (err) {
-      alert(err.response?.data?.message || "Login failed");
-      console.log("Hello")
     }
-  };
+  } catch (err) {
+    alert(err.response?.data?.message || "Login failed");
+  }
+};
+
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <form
-        onSubmit={handleLogin}
-        className="bg-white p-8 rounded-xl shadow-md w-96 space-y-4"
-      >
-        <h2 className="text-2xl font-bold text-center">Login</h2>
-        <input
-          type="text"
-          placeholder="Email or Username"
-          value={emailOrUsername}
-          onChange={(e) => setEmailOrUsername(e.target.value)}
-          className="w-full p-2 border rounded"
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full p-2 border rounded"
-        />
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
-        >
-          Login
-        </button>
-      </form>
+    <div className="min-h-screen flex items-center justify-center bg-[#fff8f0] px-4">
+      <div className="bg-white shadow-xl rounded-2xl p-10 max-w-md w-full space-y-6">
+        <h2 className="text-3xl font-extrabold text-center text-red-500">Welcome Back! 🍕</h2>
+        <p className="text-center text-gray-600 text-sm">Login to your PizzaVibe account</p>
+
+        <form onSubmit={handleLogin} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Email or Username</label>
+            <input
+              type="text"
+              value={emailOrUsername}
+              onChange={(e) => setEmailOrUsername(e.target.value)}
+              placeholder="Enter email or username"
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400"
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded-full font-semibold transition"
+          >
+            Login
+          </button>
+        </form>
+
+        <p className="text-sm text-center text-gray-600">
+          Don't have an account?{" "}
+          <a href="/register" className="text-red-500 font-semibold hover:underline">
+            Register here
+          </a>
+        </p>
+      </div>
     </div>
   );
 };

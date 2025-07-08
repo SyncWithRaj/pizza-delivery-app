@@ -15,15 +15,26 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const login = async (credentials) => {
+    await API.post("/auth/login", credentials);
+    await fetchUser();
+  };
+
+  const logout = async () => {
+    await API.post("/auth/logout");
+    setUser(null);
+  };
+
   useEffect(() => {
     fetchUser();
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, setUser }}>
+    <AuthContext.Provider value={{ user, setUser, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
+
 
 export const useAuth = () => useContext(AuthContext);

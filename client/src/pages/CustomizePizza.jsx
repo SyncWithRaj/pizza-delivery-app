@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import API from "../services/api";
-import { useNavigate } from "react-router-dom";
+import { useCart } from "../context/CartContext";
 
 const CustomizePizza = () => {
-  const navigate = useNavigate();
+  const { addToCart } = useCart();
+  const [quantity, setQuantity] = useState(1);
   const [ingredients, setIngredients] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState({
     base: "",
     sauce: "",
@@ -12,7 +14,6 @@ const CustomizePizza = () => {
     veggies: [],
     size: "medium",
     customName: "",
-    deliveryAddress: "",
   });
   const [totalPrice, setTotalPrice] = useState(0);
 
@@ -28,8 +29,7 @@ const CustomizePizza = () => {
     fetchIngredients();
   }, []);
 
-  const getIngredientsByType = (type) =>
-    ingredients.filter((ing) => ing.type === type);
+  const getByType = (type) => ingredients.filter((i) => i.type === type);
 
   useEffect(() => {
     let price = 0;
@@ -51,8 +51,8 @@ const CustomizePizza = () => {
     setTotalPrice(price);
   }, [selected, ingredients]);
 
-  const handleChange = (e) => {
-    setSelected({ ...selected, [e.target.name]: e.target.value });
+  const handleSelect = (type, id) => {
+    setSelected({ ...selected, [type]: id });
   };
 
   const handleVegToggle = (id) => {
@@ -64,199 +64,176 @@ const CustomizePizza = () => {
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleAddToCart = async (e) => {
     e.preventDefault();
-    const { base, sauce, cheese, deliveryAddress } = selected;
+    const { base, sauce, cheese } = selected;
 
-    if (!base || !sauce || !cheese || !deliveryAddress) {
-      alert("Please select base, sauce, cheese and enter address.");
+    if (!base || !sauce || !cheese) {
+      alert("Please select base, sauce and cheese.");
       return;
     }
 
-    const allIngredientIds = [
-      base,
-      sauce,
-      cheese,
-      ...selected.veggies,
-    ].filter(Boolean);
+    const allIngredientIds = [base, sauce, cheese, ...selected.veggies];
 
     try {
-      // ✅ 1. Create Pizza
+      setLoading(true);
       const pizzaRes = await API.post("/pizzas", {
         ingredients: allIngredientIds,
         size: selected.size,
         customName: selected.customName,
-        totalPrice,
+        totalPrice: totalPrice * quantity,
+        quantity,
       });
 
       const pizza = pizzaRes.data?.data;
-
-      // ✅ 2. Create Order
-      const orderRes = await API.post("/orders", {
-        pizzas: [pizza._id],
-        deliveryAddress,
-      });
-
-      const order = orderRes.data?.data;
-
-      // ✅ 3. Razorpay Order
-      const razorRes = await API.post("/razorpay/create-order", {
-        amount: totalPrice,
-      });
-
-      const { orderId } = razorRes.data?.data;
-
-      // ✅ 4. Razorpay Options
-      const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-        amount: totalPrice * 100,
-        currency: "INR",
-        name: "Pizza Delivery",
-        description: "Custom Pizza Order",
-        order_id: orderId,
-        handler: async function (response) {
-          try {
-            await API.post("/razorpay/verify", {
-              razorpay_order_id: orderId,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-              orderId: order._id,
-            });
-            alert("Payment successful! Redirecting to your orders...");
-            navigate("/my-orders"); // ✅ Redirect after success
-          } catch (err) {
-            console.error("Payment verification failed", err);
-            alert("Payment verification failed");
-          }
-        },
-        prefill: {
-          name: "Raj",
-          email: "raj@example.com",
-        },
-        theme: { color: "#0f766e" },
-      };
-
-      const razor = new window.Razorpay(options);
-      razor.open();
+      await addToCart(pizza, quantity);
+      alert("Pizza added to cart!");
     } catch (err) {
       console.error(err);
-      alert("Order failed");
+      alert("Failed to add to cart");
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const IngredientCard = ({ item, selectedId, type, isMulti = false }) => {
+    const isSelected = isMulti
+      ? selected.veggies.includes(item._id)
+      : selected[type] === item._id;
+
+    return (
+      <div
+        onClick={() =>
+          isMulti ? handleVegToggle(item._id) : handleSelect(type, item._id)
+        }
+        className={`cursor-pointer rounded-lg border p-3 w-36 text-center transition ${
+          isSelected ? "border-red-500 bg-red-50" : "hover:shadow"
+        }`}
+      >
+        <img
+          src={item.image || "/icons/placeholder.svg"}
+          alt={item.name}
+          className="h-16 w-16 mx-auto mb-2 object-contain"
+        />
+        <p className="text-sm font-semibold">{item.name}</p>
+        <p className="text-xs text-gray-500">₹{item.price}</p>
+      </div>
+    );
   };
 
   return (
     <form
-      onSubmit={handleSubmit}
-      className="max-w-2xl mx-auto p-6 bg-white shadow-md mt-10 space-y-4"
+      onSubmit={handleAddToCart}
+      className="max-w-5xl mx-auto p-6 bg-white shadow-xl mt-10 rounded-xl space-y-6"
     >
-      <h2 className="text-2xl font-bold text-center mb-4">🍕 Customize Your Pizza</h2>
+      <h2 className="text-3xl font-bold text-center text-red-500">
+        🍕 Build Your Dream Pizza
+      </h2>
 
       <input
         type="text"
         name="customName"
         value={selected.customName}
-        onChange={handleChange}
+        onChange={(e) =>
+          setSelected({ ...selected, customName: e.target.value })
+        }
         placeholder="Custom Pizza Name (optional)"
-        className="w-full p-2 border rounded"
+        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-400"
       />
 
+      {/* Size */}
       <div>
-        <label className="block font-medium mb-1">Select Size:</label>
-        <select
-          name="size"
-          value={selected.size}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        >
-          <option value="small">Small (₹30)</option>
-          <option value="medium">Medium (₹40)</option>
-          <option value="large">Large (₹50)</option>
-        </select>
-      </div>
-
-      <div>
-        <label className="block font-medium mb-1">Choose Base:</label>
-        <select
-          name="base"
-          value={selected.base}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        >
-          <option value="">-- Select Base --</option>
-          {getIngredientsByType("base").map((item) => (
-            <option key={item._id} value={item._id}>
-              {item.name} (₹{item.price})
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div>
-        <label className="block font-medium mb-1">Choose Sauce:</label>
-        <select
-          name="sauce"
-          value={selected.sauce}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        >
-          <option value="">-- Select Sauce --</option>
-          {getIngredientsByType("sauce").map((item) => (
-            <option key={item._id} value={item._id}>
-              {item.name} (₹{item.price})
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div>
-        <label className="block font-medium mb-1">Choose Cheese:</label>
-        <select
-          name="cheese"
-          value={selected.cheese}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        >
-          <option value="">-- Select Cheese --</option>
-          {getIngredientsByType("cheese").map((item) => (
-            <option key={item._id} value={item._id}>
-              {item.name} (₹{item.price})
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div>
-        <label className="block font-medium mb-1">Add Veggies:</label>
-        <div className="flex flex-wrap gap-2">
-          {getIngredientsByType("veggie").map((item) => (
-            <label key={item._id} className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={selected.veggies.includes(item._id)}
-                onChange={() => handleVegToggle(item._id)}
-              />
-              {item.name} (₹{item.price})
-            </label>
+        <label className="block font-medium mb-2 text-gray-700">
+          Choose Size
+        </label>
+        <div className="flex gap-4">
+          {["small", "medium", "large"].map((size) => (
+            <button
+              key={size}
+              type="button"
+              onClick={() => setSelected({ ...selected, size })}
+              className={`px-4 py-2 rounded-full border font-semibold transition ${
+                selected.size === size
+                  ? "bg-red-500 text-white"
+                  : "hover:bg-red-100"
+              }`}
+            >
+              {size.charAt(0).toUpperCase() + size.slice(1)} (
+              ₹{size === "small" ? 30 : size === "medium" ? 40 : 50})
+            </button>
           ))}
         </div>
       </div>
 
-      <textarea
-        name="deliveryAddress"
-        rows={3}
-        value={selected.deliveryAddress}
-        onChange={handleChange}
-        className="w-full p-2 border rounded"
-        placeholder="Enter your delivery address"
-      />
+      {/* Ingredient Types */}
+      {["base", "sauce", "cheese"].map((type) => (
+        <div key={type}>
+          <label className="block font-medium mb-2 capitalize text-gray-700">
+            Choose {type}
+          </label>
+          <div className="flex flex-wrap gap-4">
+            {getByType(type).map((item) => (
+              <IngredientCard
+                key={item._id}
+                item={item}
+                selectedId={selected[type]}
+                type={type}
+              />
+            ))}
+          </div>
+        </div>
+      ))}
 
-      <div className="text-right font-semibold text-lg">
-        Total Price: ₹{totalPrice}
+      {/* Veggies */}
+      <div>
+        <label className="block font-medium mb-2 text-gray-700">Add Veggies</label>
+        <div className="flex flex-wrap gap-4">
+          {getByType("veggie").map((item) => (
+            <IngredientCard
+              key={item._id}
+              item={item}
+              type="veggies"
+              isMulti={true}
+            />
+          ))}
+        </div>
       </div>
 
-      <button className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700">
-        Place Order & Pay
-      </button>
+      {/* Quantity & Submit */}
+      <div className="flex justify-between items-center pt-4 flex-wrap gap-4">
+        <div className="text-xl font-semibold text-gray-800">
+          Total: ₹{totalPrice} × {quantity} = ₹{totalPrice * quantity}
+        </div>
+
+        <div className="flex items-center gap-4">
+          <label className="font-medium text-gray-700">Quantity:</label>
+          <div className="flex items-center border rounded-lg overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+              className="px-3 py-1 bg-gray-200 hover:bg-gray-300 font-bold"
+            >
+              −
+            </button>
+            <span className="px-4 py-1">{quantity}</span>
+            <button
+              type="button"
+              onClick={() => setQuantity((q) => Math.min(10, q + 1))}
+              className="px-3 py-1 bg-gray-200 hover:bg-gray-300 font-bold"
+            >
+              +
+            </button>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-full font-semibold disabled:opacity-50"
+        >
+          {loading ? "Adding..." : "Add to Cart"}
+        </button>
+      </div>
     </form>
   );
 };
