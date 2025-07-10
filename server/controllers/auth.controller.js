@@ -3,6 +3,11 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
+import nodemailer from "nodemailer";
+import crypto from "crypto";
+import { transporter } from "../utils/mailer.util.js";
+
+
 
 const registerUser = asyncHandler(async (req, res) => {
     const { username, email, fullName, password, role } = req.body;
@@ -159,21 +164,81 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 });
 
 const getCurrentUser = asyncHandler(async (req, res) => {
-  // Fetch user from DB using ID from JWT payload (set by verifyJWT middleware)
-  const user = await User.findById(req.user._id).select("-password -refreshToken");
+    // Fetch user from DB using ID from JWT payload (set by verifyJWT middleware)
+    const user = await User.findById(req.user._id).select("-password -refreshToken");
 
-  if (!user) {
-    throw new ApiError(404, "User not found");
-  }
+    if (!user) {
+        throw new ApiError(404, "User not found");
+    }
 
-  // Return the user (without sensitive data)
-  res.status(200).json(new ApiResponse(200, user, "User fetched successfully"));
+    // Return the user (without sensitive data)
+    res.status(200).json(new ApiResponse(200, user, "User fetched successfully"));
 });
+
+
+const forgotPasswordController = asyncHandler(async (req, res) => {
+    const { email } = req.body;
+    if (!email) throw new ApiError(400, "Email is required");
+
+    const user = await User.findOne({ email });
+    if (!user) throw new ApiError(404, "User not found");
+
+    // Generate reset token
+    const resetToken = crypto.randomBytes(32).toString("hex");
+
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+    await user.save();
+
+    const resetUrl = `http://localhost:5173/reset-password/${resetToken}`;
+
+    // Send Email
+    await transporter.sendMail({
+        from: `"PizzaScript Support" <${process.env.SMTP_USER}>`,
+        to: user.email,
+        subject: "Reset Your Password - PizzaScript 🍕",
+        html: `
+      <h2>Hello ${user.fullName},</h2>
+      <p>You recently requested to reset your PizzaScript password.</p>
+      <p>Click the link below to reset your password. This link will expire in 1 hour:</p>
+      <a href="${resetUrl}" style="display: inline-block; padding: 10px 20px; background-color: #ef4444; color: white; border-radius: 5px; text-decoration: none;">Reset Password</a>
+      <p>If you didn't request this, you can ignore this email.</p>
+      <br/>
+      <p>🍕 With love,</p>
+      <strong>Team PizzaScript</strong>
+    `,
+    });
+
+    res.json(new ApiResponse(200, {}, "Password reset link sent to your email."));
+});
+
+const resetPassword = asyncHandler(async (req, res) => {
+    const { token } = req.params;
+    const { password } = req.body;
+
+    const user = await User.findOne({
+        resetPasswordToken: token,
+        resetPasswordExpires: { $gt: Date.now() },
+    });
+
+    if (!user) throw new ApiError(400, "Invalid or expired token");
+
+    user.password = password;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+
+    await user.save();
+
+    res.status(200).json(new ApiResponse(200, {}, "Password reset successful"));
+});
+
 
 export {
     loginUser,
     logoutUser,
     registerUser,
     getCurrentUser,
-    refreshAccessToken
+    refreshAccessToken,
+    forgotPasswordController,
+    resetPassword
 }

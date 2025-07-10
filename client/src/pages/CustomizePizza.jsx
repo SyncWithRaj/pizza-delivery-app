@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import API from "../services/api";
 import { useCart } from "../context/CartContext";
+import toast from "react-hot-toast";
 
 const CustomizePizza = () => {
   const { addToCart } = useCart();
@@ -69,7 +70,7 @@ const CustomizePizza = () => {
     const { base, sauce, cheese } = selected;
 
     if (!base || !sauce || !cheese) {
-      alert("Please select base, sauce and cheese.");
+      toast.error("Please select base, sauce and cheese.");
       return;
     }
 
@@ -87,10 +88,21 @@ const CustomizePizza = () => {
 
       const pizza = pizzaRes.data?.data;
       await addToCart(pizza, quantity);
-      alert("Pizza added to cart!");
+      toast.success("Pizza added to cart!");
+
+      // Reset form
+      setSelected({
+        base: "",
+        sauce: "",
+        cheese: "",
+        veggies: [],
+        size: "medium",
+        customName: "",
+      });
+      setQuantity(1);
     } catch (err) {
       console.error(err);
-      alert("Failed to add to cart");
+      toast.error("Failed to add to cart");
     } finally {
       setLoading(false);
     }
@@ -143,9 +155,7 @@ const CustomizePizza = () => {
 
       {/* Size */}
       <div>
-        <label className="block font-medium mb-2 text-gray-700">
-          Choose Size
-        </label>
+        <label className="block font-medium mb-2 text-gray-700">Choose Size</label>
         <div className="flex gap-4">
           {["small", "medium", "large"].map((size) => (
             <button

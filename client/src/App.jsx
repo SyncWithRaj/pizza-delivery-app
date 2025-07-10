@@ -15,6 +15,11 @@ import AdminUsers from "./pages/AdminUsers";
 import Cart from "./pages/Cart";
 import Navbar from "./components/Navbar";
 import { Toaster } from 'react-hot-toast';
+import About from "./pages/AboutPage";
+import Contact from "./pages/ContactPage"; // adjust if needed
+import Profile from "./pages/Profile";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 function App() {
   return (
@@ -35,6 +40,12 @@ function App() {
           <Route path="/admin/ingredients" element={<AdminIngredients />} />
           <Route path="/admin/users" element={<AdminUsers />} />
           <Route path="/cart" element={<Cart />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+<Route path="/reset-password/:token" element={<ResetPassword />} />
+
         </Routes>
       </BrowserRouter>
       <Toaster position="top-right" reverseOrder={false} />
