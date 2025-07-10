@@ -145,7 +145,7 @@ const Cart = () => {
 
           {/* Address Field */}
           <div className="mb-6">
-            <label className="block mb-1 font-medium text-gray-700 flex items-center gap-2">
+            <label className="mb-1 font-medium text-gray-700 flex items-center gap-2">
               <FaMapMarkerAlt className="text-red-500" /> Delivery Address
             </label>
             <textarea
