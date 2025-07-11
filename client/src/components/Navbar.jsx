@@ -12,17 +12,27 @@ import {
   FaInfoCircle,
   FaEnvelope
 } from "react-icons/fa";
+import toast from "react-hot-toast"; // 🧠 Make sure this is imported
+
+
 
 const Navbar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-
+  
+  const handleLogout = async () => {
+    try {
+      await logout(); // from AuthContext
+      toast.success("Logged out successfully!");
+      navigate("/");
+    } catch (err) {
+      console.error("Logout error", err);
+      toast.error("Logout failed!");
+    }
+  };
   const isAdmin = user?.role === "admin";
 
-  const handleLogout = () => {
-    logout();
-    navigate("/");
-  };
+  
 
   return (
     <nav className="bg-white shadow-[0_4px_20px_rgba(0,0,0,0.1)] rounded-full px-6 py-4 sticky top-4 z-50 mx-4 border border-gray-200">
@@ -105,6 +115,9 @@ const Navbar = () => {
               >
                 <FaSignOutAlt /> Logout
               </button>
+
+
+
             </>
           ) : (
             <>

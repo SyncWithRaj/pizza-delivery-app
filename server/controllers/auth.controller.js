@@ -3,64 +3,59 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
-import nodemailer from "nodemailer";
 import crypto from "crypto";
 import { transporter } from "../utils/mailer.util.js";
-
-
+import { OTP } from "../models/otp.model.js";
 
 const registerUser = asyncHandler(async (req, res) => {
-    const { username, email, fullName, password, role } = req.body;
+  const { username, email, fullName, password, role, otp } = req.body;
 
-    if (!username || !email || !fullName || !password) {
-        throw new ApiError(400, "All fields are required");
-    }
+  if (!username || !email || !fullName || !password || !otp) {
+    throw new ApiError(400, "All fields including OTP are required");
+  }
 
+  const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+  if (existingUser) throw new ApiError(409, "User already exists");
 
-    const existingUser = await User.findOne({ $or: [{ email }, { username }] });
-    if (existingUser) {
-        throw new ApiError(409, "User already exists");
-    }
+  const recentOtp = await OTP.findOne({ email }).sort({ createdAt: -1 });
 
-    const allowedRoles = ["user", "admin"];
-    const userRole = allowedRoles.includes(role) ? role : "user";
-    const newUser = await User.create({
-        username,
-        email,
-        fullName,
-        password,
-        role: userRole
-    });
+  if (!recentOtp || recentOtp.otp !== otp || recentOtp.expiresAt < Date.now()) {
+    throw new ApiError(400, "Invalid or expired OTP");
+  }
 
-    const accessToken = newUser.generateAccessToken();
-    const refreshToken = newUser.generateRefreshToken();
+  await OTP.deleteMany({ email });
 
-    newUser.refreshToken = refreshToken;
-    await newUser.save({ validateBeforeSave: false });
+  const userRole = ["user", "admin"].includes(role) ? role : "user";
 
-    res
-        .status(201)
-        .cookie("accessToken", accessToken, {
-            httpOnly: true,
-            secure: true,
-            sameSite: "None",
-            maxAge: 15 * 60 * 1000,
-        })
-        .cookie("refreshToken", refreshToken, {
-            httpOnly: true,
-            secure: true,
-            sameSite: "None",
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-        })
-        .json(
-            new ApiResponse(201, {
-                _id: newUser._id,
-                username: newUser.username,
-                email: newUser.email,
-                fullName: newUser.fullName,
-                role: newUser.role,
-            }, "User registered successfully")
-        );
+  const newUser = await User.create({ username, email, fullName, password, role: userRole });
+
+  const accessToken = newUser.generateAccessToken();
+  const refreshToken = newUser.generateRefreshToken();
+
+  newUser.refreshToken = refreshToken;
+  await newUser.save({ validateBeforeSave: false });
+
+  res
+    .status(201)
+    .cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+      maxAge: 15 * 60 * 1000,
+    })
+    .cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    })
+    .json(new ApiResponse(201, {
+      _id: newUser._id,
+      username: newUser.username,
+      email: newUser.email,
+      fullName: newUser.fullName,
+      role: newUser.role,
+    }, "User registered successfully"));
 });
 
 const loginUser = asyncHandler(async (req, res) => {
@@ -232,6 +227,68 @@ const resetPassword = asyncHandler(async (req, res) => {
     res.status(200).json(new ApiResponse(200, {}, "Password reset successful"));
 });
 
+const sendLoginOtp = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+  if (!email) throw new ApiError(400, "Email is required");
+
+  const user = await User.findOne({ email });
+  if (!user) throw new ApiError(404, "User not found");
+
+  const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+  await OTP.create({ email, otp: otpCode, expiresAt: Date.now() + 10 * 60 * 1000 });
+
+  await transporter.sendMail({
+    from: process.env.SMTP_USER,
+    to: email,
+    subject: "Login OTP - PizzaScript",
+    html: `<h2>Your OTP is: ${otpCode}</h2><p>Valid for 10 minutes.</p>`,
+  });
+
+  res.status(200).json(new ApiResponse(200, null, "OTP sent to your email"));
+});
+
+const loginWithOtp = asyncHandler(async (req, res) => {
+  const { email, otp } = req.body;
+  if (!email || !otp) throw new ApiError(400, "Email and OTP are required");
+
+  const validOtp = await OTP.findOne({ email, otp, expiresAt: { $gt: Date.now() } });
+  if (!validOtp) throw new ApiError(400, "Invalid or expired OTP");
+
+  const user = await User.findOne({ email });
+  if (!user) throw new ApiError(404, "User not found");
+
+  const accessToken = user.generateAccessToken();
+  const refreshToken = user.generateRefreshToken();
+
+  user.refreshToken = refreshToken;
+  await user.save({ validateBeforeSave: false });
+  await OTP.deleteMany({ email }); // Clear old OTPs
+
+  res
+    .status(200)
+    .cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+      maxAge: 15 * 60 * 1000,
+    })
+    .cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    })
+    .json(
+      new ApiResponse(200, {
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+        fullName: user.fullName,
+        role: user.role,
+      }, "Logged in via OTP")
+    );
+});
+
 
 export {
     loginUser,
@@ -240,5 +297,7 @@ export {
     getCurrentUser,
     refreshAccessToken,
     forgotPasswordController,
-    resetPassword
+    resetPassword,
+    sendLoginOtp,
+    loginWithOtp
 }

@@ -20,16 +20,18 @@ import Contact from "./pages/ContactPage"; // adjust if needed
 import Profile from "./pages/Profile";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
-
+import UpdateProfile from "./pages/UpdateProfile";
+import LoginWithOtp from "./pages/LoginWithOtp";
 function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <Navbar />
         <Routes>
-          <Route path="/logout" element={<Logout />} />
+          {/* <Route path="/logout" element={<Logout />} /> */}
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/login-otp" element={<LoginWithOtp />} />
           <Route path="/register" element={<Register />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/customize" element={<CustomizePizza />} />
@@ -44,7 +46,8 @@ function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
-<Route path="/reset-password/:token" element={<ResetPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
+          <Route path="/update-profile" element={<UpdateProfile />} />
 
         </Routes>
       </BrowserRouter>

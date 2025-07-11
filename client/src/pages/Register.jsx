@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import API from "../services/api";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
 
 const Register = () => {
@@ -10,25 +11,37 @@ const Register = () => {
     email: "",
     password: "",
     role: "user",
+    otp: "",
   });
 
-  const { setUser } = useAuth();
+  const [otpSent, setOtpSent] = useState(false);
   const navigate = useNavigate();
+  const { setUser } = useAuth();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const sendOtp = async () => {
+    if (!form.email) return toast.error("Please enter email first");
+    try {
+      await API.post("/auth/send-otp", { email: form.email });
+      toast.success("OTP sent to your email");
+      setOtpSent(true);
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to send OTP");
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await API.post("/auth/register", form);
-      const { data } = await API.get("/auth/me");
-      setUser(data.data);
+      const res = await API.post("/auth/register", form);
+      setUser(res.data.data);
+      toast.success("Registered successfully!");
       navigate("/");
     } catch (err) {
-      console.error(err);
-      alert(err.response?.data?.message || "Registration failed");
+      toast.error(err.response?.data?.message || "Registration failed");
     }
   };
 
@@ -36,90 +49,79 @@ const Register = () => {
     <div className="min-h-screen flex items-center justify-center bg-[#fff8f0] px-4">
       <div className="bg-white shadow-xl rounded-2xl p-10 max-w-md w-full space-y-6">
         <h2 className="text-3xl font-extrabold text-center text-red-500">Create Account 🍕</h2>
-        <p className="text-center text-gray-600 text-sm">Join PizzaVibe and start customizing your pizza today!</p>
+        <p className="text-center text-gray-600 text-sm">Register with OTP verification</p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-            <input
-              type="text"
-              name="fullName"
-              value={form.fullName}
-              onChange={handleChange}
-              placeholder="Enter your full name"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400"
-              required
-            />
-          </div>
+          <input
+            type="text"
+            name="fullName"
+            placeholder="Full Name"
+            value={form.fullName}
+            onChange={handleChange}
+            className="w-full px-4 py-2 border rounded-lg"
+            required
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
-            <input
-              type="text"
-              name="username"
-              value={form.username}
-              onChange={handleChange}
-              placeholder="Choose a username"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400"
-              required
-            />
-          </div>
+          <input
+            type="text"
+            name="username"
+            placeholder="Username"
+            value={form.username}
+            onChange={handleChange}
+            className="w-full px-4 py-2 border rounded-lg"
+            required
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <div className="flex gap-2">
             <input
               type="email"
               name="email"
+              placeholder="Email"
               value={form.email}
               onChange={handleChange}
-              placeholder="Enter your email"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400"
+              className="w-full px-4 py-2 border rounded-lg"
               required
             />
+            <button
+              type="button"
+              onClick={sendOtp}
+              className="px-4 py-2 bg-red-500 text-white rounded-lg"
+            >
+              Send OTP
+            </button>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+          {otpSent && (
             <input
-              type="password"
-              name="password"
-              value={form.password}
+              type="text"
+              name="otp"
+              placeholder="Enter OTP"
+              value={form.otp}
               onChange={handleChange}
-              placeholder="Create a password"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400"
+              className="w-full px-4 py-2 border rounded-lg"
               required
             />
-          </div>
+          )}
 
-          {/* Optional: Role selector for testing */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Select Role</label>
-            <div className="relative">
-              <select
-                name="role"
-                value={form.role}
-                onChange={handleChange}
-                className="appearance-none w-full px-4 py-2 pr-10 border rounded-lg text-gray-700 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-red-400"
-              >
-                <option value="user">👤 User</option>
-                <option value="admin">🛠️ Admin</option>
-              </select>
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={form.password}
+            onChange={handleChange}
+            className="w-full px-4 py-2 border rounded-lg"
+            required
+          />
 
-              {/* Down arrow icon */}
-              <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
-                <svg
-                  className="w-4 h-4 text-gray-500"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                </svg>
-              </div>
-            </div>
-          </div>
-
+          <select
+            name="role"
+            value={form.role}
+            onChange={handleChange}
+            className="w-full px-4 py-2 border rounded-lg"
+          >
+            <option value="user">👤 User</option>
+            <option value="admin">🛠️ Admin</option>
+          </select>
 
           <button
             type="submit"
