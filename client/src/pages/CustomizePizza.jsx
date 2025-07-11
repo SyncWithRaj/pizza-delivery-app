@@ -24,7 +24,7 @@ const CustomizePizza = () => {
         const res = await API.get("/ingredients");
         setIngredients(res.data?.data || []);
       } catch (err) {
-        console.error("Error fetching ingredients", err);
+        toast.error("Failed to fetch ingredients");
       }
     };
     fetchIngredients();
@@ -90,7 +90,6 @@ const CustomizePizza = () => {
       await addToCart(pizza, quantity);
       toast.success("Pizza added to cart!");
 
-      // Reset form
       setSelected({
         base: "",
         sauce: "",
@@ -101,7 +100,6 @@ const CustomizePizza = () => {
       });
       setQuantity(1);
     } catch (err) {
-      console.error(err);
       toast.error("Failed to add to cart");
     } finally {
       setLoading(false);
@@ -118,14 +116,16 @@ const CustomizePizza = () => {
         onClick={() =>
           isMulti ? handleVegToggle(item._id) : handleSelect(type, item._id)
         }
-        className={`cursor-pointer rounded-lg border p-3 w-36 text-center transition ${
-          isSelected ? "border-red-500 bg-red-50" : "hover:shadow"
+        className={`cursor-pointer rounded-xl border p-4 w-36 text-center transition-all duration-200 ease-in-out transform ${
+          isSelected
+            ? "bg-red-100 border-red-500 scale-105 shadow-md"
+            : "hover:shadow hover:scale-105"
         }`}
       >
         <img
           src={item.image || "/icons/placeholder.svg"}
           alt={item.name}
-          className="h-16 w-16 mx-auto mb-2 object-contain"
+          className="h-16 w-16 mx-auto mb-2 object-contain transition-transform duration-200"
         />
         <p className="text-sm font-semibold">{item.name}</p>
         <p className="text-xs text-gray-500">₹{item.price}</p>
@@ -136,9 +136,9 @@ const CustomizePizza = () => {
   return (
     <form
       onSubmit={handleAddToCart}
-      className="max-w-5xl mx-auto p-6 bg-white shadow-xl mt-10 rounded-xl space-y-6"
+      className="max-w-6xl mx-auto p-6 bg-gradient-to-br from-red-50 to-white shadow-xl mt-10 rounded-xl space-y-6 animate-fade-in bg-[#fff8f0] "
     >
-      <h2 className="text-3xl font-bold text-center text-red-500">
+      <h2 className="text-4xl font-extrabold text-center text-red-600 drop-shadow-sm">
         🍕 Build Your Dream Pizza
       </h2>
 
@@ -150,10 +150,10 @@ const CustomizePizza = () => {
           setSelected({ ...selected, customName: e.target.value })
         }
         placeholder="Custom Pizza Name (optional)"
-        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-400"
+        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-400 shadow-sm"
       />
 
-      {/* Size */}
+      {/* Size Selection */}
       <div>
         <label className="block font-medium mb-2 text-gray-700">Choose Size</label>
         <div className="flex gap-4">
@@ -162,9 +162,9 @@ const CustomizePizza = () => {
               key={size}
               type="button"
               onClick={() => setSelected({ ...selected, size })}
-              className={`px-4 py-2 rounded-full border font-semibold transition ${
+              className={`px-5 py-2 rounded-full border font-semibold transition-all duration-200 ${
                 selected.size === size
-                  ? "bg-red-500 text-white"
+                  ? "bg-red-500 text-white shadow"
                   : "hover:bg-red-100"
               }`}
             >
@@ -175,7 +175,7 @@ const CustomizePizza = () => {
         </div>
       </div>
 
-      {/* Ingredient Types */}
+      {/* Base, Sauce, Cheese Sections */}
       {["base", "sauce", "cheese"].map((type) => (
         <div key={type}>
           <label className="block font-medium mb-2 capitalize text-gray-700">
@@ -194,7 +194,7 @@ const CustomizePizza = () => {
         </div>
       ))}
 
-      {/* Veggies */}
+      {/* Veggies Section */}
       <div>
         <label className="block font-medium mb-2 text-gray-700">Add Veggies</label>
         <div className="flex flex-wrap gap-4">
@@ -212,24 +212,25 @@ const CustomizePizza = () => {
       {/* Quantity & Submit */}
       <div className="flex justify-between items-center pt-4 flex-wrap gap-4">
         <div className="text-xl font-semibold text-gray-800">
-          Total: ₹{totalPrice} × {quantity} = ₹{totalPrice * quantity}
+          Total: ₹{totalPrice} × {quantity} ={" "}
+          <span className="text-green-600 font-bold">₹{totalPrice * quantity}</span>
         </div>
 
         <div className="flex items-center gap-4">
           <label className="font-medium text-gray-700">Quantity:</label>
-          <div className="flex items-center border rounded-lg overflow-hidden">
+          <div className="flex items-center border rounded-lg overflow-hidden shadow-sm">
             <button
               type="button"
               onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-              className="px-3 py-1 bg-gray-200 hover:bg-gray-300 font-bold"
+              className="px-3 py-1 bg-gray-200 hover:bg-gray-300 font-bold transition"
             >
               −
             </button>
-            <span className="px-4 py-1">{quantity}</span>
+            <span className="px-4 py-1 bg-white">{quantity}</span>
             <button
               type="button"
               onClick={() => setQuantity((q) => Math.min(10, q + 1))}
-              className="px-3 py-1 bg-gray-200 hover:bg-gray-300 font-bold"
+              className="px-3 py-1 bg-gray-200 hover:bg-gray-300 font-bold transition"
             >
               +
             </button>
@@ -239,7 +240,7 @@ const CustomizePizza = () => {
         <button
           type="submit"
           disabled={loading}
-          className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-full font-semibold disabled:opacity-50"
+          className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-full font-semibold transition-all duration-200 disabled:opacity-50"
         >
           {loading ? "Adding..." : "Add to Cart"}
         </button>

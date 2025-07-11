@@ -3,15 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import API from "../services/api";
 import toast from "react-hot-toast";
+import { FaUserEdit } from "react-icons/fa";
 
 const UpdateProfile = () => {
   const { user, setUser } = useAuth();
   const navigate = useNavigate();
 
-  const [form, setForm] = useState({
-    username: "",
-    email: "",
-  });
+  const [form, setForm] = useState({ username: "", email: "" });
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState("");
 
@@ -66,8 +64,10 @@ const UpdateProfile = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#fff8f0] px-4">
-      <div className="bg-white shadow-xl rounded-2xl p-10 max-w-md w-full space-y-6">
-        <h2 className="text-3xl font-extrabold text-center text-red-500">Update Profile</h2>
+      <div className="bg-white border shadow-xl rounded-2xl p-10 max-w-md w-full space-y-6 transition duration-300 hover:shadow-2xl">
+        <h2 className="text-3xl font-extrabold text-center text-red-600 flex items-center justify-center gap-2">
+          <FaUserEdit /> Update Profile
+        </h2>
 
         <form onSubmit={handleUpdate} className="space-y-4">
           <div>
@@ -77,7 +77,7 @@ const UpdateProfile = () => {
               name="username"
               value={form.username}
               onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-400"
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400"
               required
             />
           </div>
@@ -89,7 +89,7 @@ const UpdateProfile = () => {
               name="email"
               value={form.email}
               onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-400"
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400"
               required
             />
           </div>
@@ -98,7 +98,7 @@ const UpdateProfile = () => {
             <button
               type="button"
               onClick={sendOTP}
-              className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-full font-semibold"
+              className="w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded-full font-semibold transition"
             >
               Send OTP
             </button>
@@ -110,14 +110,14 @@ const UpdateProfile = () => {
                   type="text"
                   value={otp}
                   onChange={(e) => setOtp(e.target.value)}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-400"
+                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400"
                   required
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded-full font-semibold"
+                className="w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded-full font-semibold transition"
               >
                 Verify OTP & Update
               </button>

@@ -4,8 +4,9 @@ import { useEffect } from "react";
 import API from "../services/api";
 import toast from "react-hot-toast";
 import { FaShoppingCart, FaStar } from "react-icons/fa";
+import { motion } from "framer-motion";
 
-// ✅ Replace these with actual MongoDB ingredient _ids
+// ✅ Replace with real MongoDB _ids
 const popularItems = [
   {
     id: 1,
@@ -39,10 +40,6 @@ const popularItems = [
 const Home = () => {
   const { user } = useAuth();
 
-  useEffect(() => {
-    // You can add any redirect logic here if needed
-  }, [user]);
-
   const handleAddPopularToCart = async (item) => {
     if (!user) {
       toast.error("Please login to add to cart");
@@ -50,7 +47,6 @@ const Home = () => {
     }
 
     try {
-      // 1. Create pizza
       const pizzaRes = await API.post("/pizzas", {
         ingredients: item.ingredients,
         size: item.size,
@@ -59,8 +55,6 @@ const Home = () => {
       });
 
       const pizza = pizzaRes.data?.data;
-
-      // 2. Add to cart
       await API.post("/cart/add", { pizzaId: pizza._id });
 
       toast.success(`${item.name} added to cart`);
@@ -71,54 +65,84 @@ const Home = () => {
   };
 
   return (
-    <>
-      <div className="bg-[#fff8f0] text-gray-800 -mt-19">
-        {/* Hero */}
-        <section
-          className="relative bg-cover bg-center h-[101vh]"
-          style={{ backgroundImage: "url('/images/delicious-pizza-studio.jpg')" }}
+    <div className="bg-[#fff8f0] text-gray-800 -mt-19 overflow-x-hidden">
+      {/* Hero Section */}
+      <section
+        className="relative bg-cover bg-center h-[102vh] grid grid-cols-1 md:grid-cols-2"
+        style={{ backgroundImage: "url('/images/home.jpg')" }}
+      >
+        <div className="absolute inset-0 bg-opacity-50 z-0" />
+
+        <div></div>
+
+        <motion.div
+          initial={{ opacity: 0, x: 100 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 1 }}
+          className="relative z-10 flex items-center justify-center px-6 md:px-16"
         >
-          <div className="absolute inset-0 bg-opacity-50 flex flex-col top-[380px] items-center text-center px-4">
+          <div className="text-center max-w-4xl space-y-6 backdrop-blur-sm p-8 rounded-xl">
+            <h1 className="text-4xl md:text-5xl font-extrabold text-white drop-shadow-lg">
+              Welcome to PizzaScript 🍕
+            </h1>
+            <p className="text-lg md:text-xl text-gray-200 drop-shadow">
+              Where code meets crust – build your dream pizza with just a few clicks!
+            </p>
             <Link
               to={user ? "/customize" : "/login"}
-              className="bg-white hover:bg-gray-300 text-red-700 px-8 py-3 rounded-full text-lg font-semibold transition-all shadow-lg"
+              className="inline-block bg-red-500 hover:bg-red-600 text-white px-8 py-3 rounded-full text-lg font-semibold transition-all shadow-lg hover:scale-105"
             >
               {user ? "Customize Pizza" : "Get Started"}
             </Link>
           </div>
-        </section>
+        </motion.div>
+      </section>
 
-        {/* Popular Picks */}
-        <section className="py-16 px-6 max-w-6xl mx-auto">
-          <h2 className="text-5xl font-bold mb-10 text-center flex justify-center items-center gap-2"><FaStar className="text-yellow-400"/>  Popular Picks</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {popularItems.map((item) => (
-              <div key={item.id} className="bg-white rounded-2xl shadow-md overflow-hidden">
-                <img src={item.image} alt={item.name} className="w-full h-48 object-cover" />
-                <div className="p-5">
-                  <h3 className="text-xl font-semibold flex items-center gap-2">
-                    {item.name}
-                  </h3>
-                  <div className="flex items-center mt-2 text-sm">
-                    <span className="text-yellow-500 flex items-center gap-1">
-                      <FaStar /> {item.rating}
-                    </span>
-                    <span className="ml-auto font-bold">₹{item.price}</span>
-                  </div>
-                  <button
-                    className="mt-4 w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded-full font-semibold flex justify-center items-center gap-2"
-                    onClick={() => handleAddPopularToCart(item)}
-                  >
-                    <FaShoppingCart className="text-lg" />
-                    Add to Cart
-                  </button>
+      {/* Popular Picks */}
+      <section className="py-20 px-6 max-w-6xl mx-auto">
+        <h2 className="text-5xl font-bold mb-12 text-center flex justify-center items-center gap-2">
+          <FaStar className="text-yellow-400" />
+          Popular Picks
+        </h2>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+          {popularItems.map((item, index) => (
+            <motion.div
+              key={item.id}
+              className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300"
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.2, duration: 0.5 }}
+              viewport={{ once: true }}
+            >
+              <img
+                src={item.image}
+                alt={item.name}
+                className="w-full h-48 object-cover hover:scale-105 transition-transform duration-300"
+              />
+              <div className="p-5">
+                <h3 className="text-xl font-semibold mb-1 flex items-center gap-2">
+                  {item.name}
+                </h3>
+                <div className="flex items-center text-sm mb-2">
+                  <span className="text-yellow-500 flex items-center gap-1">
+                    <FaStar /> {item.rating}
+                  </span>
+                  <span className="ml-auto font-bold">₹{item.price}</span>
                 </div>
+                <button
+                  className="mt-3 w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded-full font-semibold flex justify-center items-center gap-2 transition-all duration-300 hover:scale-105"
+                  onClick={() => handleAddPopularToCart(item)}
+                >
+                  <FaShoppingCart />
+                  Add to Cart
+                </button>
               </div>
-            ))}
-          </div>
-        </section>
-      </div>
-    </>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+    </div>
   );
 };
 

@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import API from "../services/api";
-import { FaPizzaSlice, FaRupeeSign, FaTrashAlt, FaArrowsAltH } from "react-icons/fa";
+import {
+  FaPizzaSlice,
+  FaRupeeSign,
+  FaTrashAlt,
+  FaArrowsAltH,
+} from "react-icons/fa";
 import toast from "react-hot-toast";
 
 const AdminPizzas = () => {
@@ -31,42 +36,42 @@ const AdminPizzas = () => {
   }, []);
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
-      <h2 className="text-3xl font-bold text-center text-red-600 mb-8 flex items-center justify-center gap-2">
+    <div className="p-6 max-w-full mx-auto min-h-[90vh] bg-[#fff8f0]">
+      <h2 className="text-4xl font-extrabold text-center text-red-600 mb-10 flex items-center justify-center gap-2">
         <FaPizzaSlice /> All Pizzas
       </h2>
 
       {pizzas.length === 0 ? (
-        <p className="text-center text-gray-500">No pizzas available.</p>
+        <p className="text-center text-gray-500 text-lg">No pizzas available.</p>
       ) : (
-        <div className="grid gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-5xl mx-auto">
           {pizzas.map((pizza) => (
             <div
               key={pizza._id}
-              className="border rounded-xl p-6 bg-white shadow-md hover:shadow-lg transition"
+              className="bg-white border rounded-2xl shadow-md hover:shadow-xl hover:scale-[1.01] transition-all duration-300 p-6 space-y-4"
             >
-              <div className="flex justify-between items-center mb-3">
-                <h3 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
+              <div className="flex justify-between items-center">
+                <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
                   <FaPizzaSlice className="text-red-500" />
                   {pizza.customName || "Custom Pizza"}
                 </h3>
                 <button
                   onClick={() => deletePizza(pizza._id)}
-                  className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 text-sm rounded"
+                  className="flex items-center gap-2 text-white bg-red-600 hover:bg-red-700 px-4 py-2 rounded-md text-sm font-medium transition"
                 >
                   <FaTrashAlt />
                   Delete
                 </button>
               </div>
 
-              <div className="flex flex-wrap gap-6 text-gray-700 text-sm">
+              <div className="flex justify-between text-gray-700 text-sm font-medium">
                 <p className="flex items-center gap-1">
-                  <FaRupeeSign /> <span className="font-medium">Price:</span> ₹
-                  {pizza.totalPrice + 30}
+                  <FaRupeeSign className="text-green-600" />
+                  Price: ₹{pizza.totalPrice + 30}
                 </p>
                 <p className="flex items-center gap-1">
-                  <FaArrowsAltH /> <span className="font-medium">Size:</span>{" "}
-                  {pizza.size}
+                  <FaArrowsAltH className="text-yellow-600" />
+                  Size: {pizza.size}
                 </p>
               </div>
             </div>

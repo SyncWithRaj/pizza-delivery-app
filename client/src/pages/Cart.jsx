@@ -92,9 +92,10 @@ const Cart = () => {
     }
   };
 
-  return (
-    <div className="max-w-4xl mx-auto p-6">
-      <h2 className="text-3xl font-bold mb-8 text-red-600 text-center flex items-center justify-center gap-2">
+return (
+  <div className="bg-[#fff8f0] min-h-[90vh] px-4 py-10">
+    <div className="max-w-4xl mx-auto">
+      <h2 className="text-3xl font-bold mb-10 text-red-600 text-center flex items-center justify-center gap-2">
         <FaShoppingCart className="text-red-500" />
         Your Cart
       </h2>
@@ -103,18 +104,19 @@ const Cart = () => {
         <p className="text-gray-600 text-center">🧺 Your cart is empty.</p>
       ) : (
         <>
-          <ul className="mb-6 space-y-6">
+          {/* Grid style cards */}
+          <div className="grid gap-6 md:grid-cols-1 mb-8">
             {cartItems.map((pizza, i) => (
-              <li
+              <div
                 key={i}
-                className="border rounded-xl bg-white p-6 shadow-sm transition hover:shadow-md"
+                className="border rounded-2xl bg-white p-6 shadow-sm transition-transform hover:scale-[1.02] hover:shadow-lg duration-300"
               >
-                <div className="flex justify-between items-center mb-2">
-                  <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                <div className="flex justify-between items-center mb-3">
+                  <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
                     <FaPizzaSlice className="text-yellow-500" />
                     {pizza.customName || "Custom Pizza"}
                   </h3>
-                  <span className="text-sm text-gray-600 bg-yellow-100 px-2 py-0.5 rounded-full">
+                  <span className="text-sm text-gray-600 bg-yellow-100 px-3 py-1 rounded-full">
                     Size: {pizza.size}
                   </span>
                 </div>
@@ -130,7 +132,7 @@ const Cart = () => {
                   ))}
                 </ul>
 
-                <div className="flex justify-between items-center font-medium text-gray-800 mt-2">
+                <div className="flex justify-between items-center font-medium text-gray-800">
                   <span>Quantity: {pizza.quantity || 1}</span>
                   <span>
                     ₹{pizza.totalPrice} × {pizza.quantity || 1} ={" "}
@@ -139,9 +141,9 @@ const Cart = () => {
                     </span>
                   </span>
                 </div>
-              </li>
+              </div>
             ))}
-          </ul>
+          </div>
 
           {/* Address Field */}
           <div className="mb-6">
@@ -159,8 +161,8 @@ const Cart = () => {
           </div>
 
           {/* Total + Checkout */}
-          <div className="flex flex-col sm:flex-row justify-between items-center">
-            <div className="text-xl font-bold mb-4 sm:mb-0 flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div className="text-xl font-bold flex items-center gap-2">
               Total Payable:{" "}
               <span className="text-green-700 flex items-center">
                 <FaRupeeSign /> {totalPrice}
@@ -168,7 +170,7 @@ const Cart = () => {
             </div>
             <button
               onClick={handleCheckout}
-              className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg text-lg font-semibold transition"
+              className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-full text-lg font-semibold transition duration-300"
             >
               Proceed to Pay
             </button>
@@ -176,7 +178,9 @@ const Cart = () => {
         </>
       )}
     </div>
-  );
+  </div>
+);
+
 };
 
 export default Cart;
