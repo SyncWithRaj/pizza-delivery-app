@@ -136,7 +136,7 @@ const CustomizePizza = () => {
   return (
     <form
       onSubmit={handleAddToCart}
-      className="max-w-6xl mx-auto p-6 bg-gradient-to-br from-red-50 to-white shadow-xl mt-10 rounded-xl space-y-6 animate-fade-in bg-[#fff8f0] "
+      className="max-w-6xl mx-auto p-6 bg-gradient-to-br from-red-50 to-white shadow-xl mt-10 rounded-xl space-y-6 animate-fade-in mb-10 pt-14 "
     >
       <h2 className="text-4xl font-extrabold text-center text-red-600 drop-shadow-sm">
         🍕 Build Your Dream Pizza

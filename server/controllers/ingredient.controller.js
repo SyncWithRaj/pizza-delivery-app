@@ -2,29 +2,40 @@ import { Ingredient } from "../models/ingredient.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { ApiError } from "../utils/ApiError.js";
+import { uploadOnCloudinary } from "../utils/uploadOnCloudinary.js";
 
-// Create Ingredient (admin only)
+// ✅ Create Ingredient with optional image (admin only)
 export const createIngredient = asyncHandler(async (req, res) => {
-  const { name, price, type } = req.body;
+  const { name, price, type, stock, image } = req.body;
 
-  if (!name || !price) {
-    throw new ApiError(400, "Name and price are required");
+  if (!name || !price || !type || !image) {
+    throw new ApiError(400, "All fields including image are required");
   }
 
   const existing = await Ingredient.findOne({ name });
   if (existing) throw new ApiError(409, "Ingredient already exists");
 
-  const ingredient = await Ingredient.create({ name, price, type });
-  res.status(201).json(new ApiResponse(201, ingredient, "Ingredient created"));
+  const ingredient = await Ingredient.create({
+    name,
+    price,
+    type,
+    stock,
+    image, // ✅ directly take from req.body
+  });
+
+  res
+    .status(201)
+    .json(new ApiResponse(201, ingredient, "Ingredient created with image"));
 });
 
-// Get All Ingredients (public)
+
+// ✅ Get All Ingredients (public)
 export const getAllIngredients = asyncHandler(async (req, res) => {
   const ingredients = await Ingredient.find();
   res.status(200).json(new ApiResponse(200, ingredients));
 });
 
-// Delete Ingredient (admin)
+// ✅ Delete Ingredient (admin)
 export const deleteIngredient = asyncHandler(async (req, res) => {
   const ingredient = await Ingredient.findByIdAndDelete(req.params.id);
   if (!ingredient) throw new ApiError(404, "Ingredient not found");

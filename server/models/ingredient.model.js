@@ -22,6 +22,10 @@ const ingredientSchema = new Schema(
       type: Number,
       default: 50,
     },
+    image: {
+      type: String, // URL from Cloudinary
+      default: "",  // Optional, not required
+    },
   },
   { timestamps: true }
 );

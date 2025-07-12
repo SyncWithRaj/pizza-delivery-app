@@ -23,6 +23,7 @@ const AdminIngredients = () => {
     price: "",
     stock: "",
   });
+  const [imageFile, setImageFile] = useState(null);
 
   const fetchIngredients = async () => {
     try {
@@ -51,22 +52,41 @@ const AdminIngredients = () => {
     e.preventDefault();
     const { name, type, price, stock } = newIngredient;
 
-    if (!name || !type || !price || !stock) {
-      toast.error("Please fill all fields");
+    if (!name || !type || !price || !stock || !imageFile) {
+      toast.error("Please fill all fields and select an image");
       return;
     }
 
     try {
+      // Upload image to Cloudinary
+      const formData = new FormData();
+      formData.append("file", imageFile);
+      formData.append("upload_preset", "pizza_ingredient_upload"); // ✅ This line is important
+
+      const cloudRes = await fetch("https://api.cloudinary.com/v1_1/mrcoderraj/image/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const cloudData = await cloudRes.json();
+      const imageUrl = cloudData.secure_url;
+
+
+      // Save ingredient with image URL
       const res = await API.post("/ingredients", {
         name,
         type,
         price: Number(price),
         stock: Number(stock),
+        image: imageUrl,
       });
+
       setIngredients((prev) => [...prev, res.data.data]);
       setNewIngredient({ name: "", type: "", price: "", stock: "" });
-      toast.success("Ingredient added");
-    } catch {
+      setImageFile(null);
+      toast.success("Ingredient added with image!");
+    } catch (err) {
+      console.error(err);
       toast.error("Add failed");
     }
   };
@@ -82,12 +102,10 @@ const AdminIngredients = () => {
     { type: "veggie", icon: <FaCarrot />, label: "Veggie" },
   ];
 
-  const filteredIngredients = ingredients.filter(
-    (ing) => ing.type === selectedType
-  );
+  const filteredIngredients = ingredients.filter((ing) => ing.type === selectedType);
 
   return (
-    <div className="p-16 max-w-full mx-auto bg-[#fff8f0] ">
+    <div className="p-16 max-w-full mx-auto bg-[#fff8f0]">
       <h2 className="text-3xl font-bold text-center text-red-600 mb-6 flex items-center justify-center gap-2">
         <FaListUl /> Manage Ingredients
       </h2>
@@ -137,6 +155,12 @@ const AdminIngredients = () => {
             onChange={handleInputChange}
             className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400"
           />
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => setImageFile(e.target.files[0])}
+            className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400"
+          />
         </div>
         <button
           type="submit"
@@ -152,18 +176,17 @@ const AdminIngredients = () => {
           <button
             key={tab.type}
             onClick={() => setSelectedType(tab.type)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold transition ${
-              selectedType === tab.type
+            className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold transition ${selectedType === tab.type
                 ? "bg-red-600 text-white"
                 : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-            }`}
+              }`}
           >
             {tab.icon} {tab.label}
           </button>
         ))}
       </div>
 
-      {/* Ingredients List for Selected Type */}
+      {/* Ingredients List */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-5xl mx-auto">
         {filteredIngredients.map((ing) => (
           <div
