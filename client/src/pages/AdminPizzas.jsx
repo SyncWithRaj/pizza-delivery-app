@@ -67,7 +67,7 @@ const AdminPizzas = () => {
               <div className="flex justify-between text-gray-700 text-sm font-medium">
                 <p className="flex items-center gap-1">
                   <FaRupeeSign className="text-green-600" />
-                  Price: ₹{pizza.totalPrice + 30}
+                  Price: ₹{pizza.totalPrice}
                 </p>
                 <p className="flex items-center gap-1">
                   <FaArrowsAltH className="text-yellow-600" />

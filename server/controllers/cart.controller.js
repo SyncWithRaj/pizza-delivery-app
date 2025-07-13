@@ -53,9 +53,9 @@ export const addToCart = asyncHandler(async (req, res) => {
 });
 
 
-// ✅ Remove Item
+// ✅ Remove Item from Cart
 export const removeFromCart = asyncHandler(async (req, res) => {
-  const { pizzaId } = req.body;
+  const { pizzaId } = req.params; // ✅ FIXED
 
   const cart = await Cart.findOne({ user: req.user._id });
   if (!cart) throw new ApiError(404, "Cart not found");
@@ -65,6 +65,7 @@ export const removeFromCart = asyncHandler(async (req, res) => {
 
   res.status(200).json(new ApiResponse(200, cart, "Item removed from cart"));
 });
+
 
 // ✅ Clear Cart (after order placed)
 export const clearCart = asyncHandler(async (req, res) => {

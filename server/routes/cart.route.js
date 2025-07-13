@@ -14,7 +14,7 @@ router.use(verifyJWT);
 
 router.get("/", getCart);
 router.post("/add", addToCart);
-router.post("/remove", removeFromCart);
 router.delete("/clear", clearCart);
+router.delete("/remove/:pizzaId", verifyJWT, removeFromCart);
 
 export default router;

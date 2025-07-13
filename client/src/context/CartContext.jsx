@@ -23,15 +23,18 @@ export const CartProvider = ({ children }) => {
     fetchCart();
   }, []);
 
-  // ✅ Add to cart (calls backend)
-  const addToCart = async (pizza) => {
+  const addToCart = async (pizza, quantity = 1) => {
     try {
-      const res = await API.post("/cart/add", { pizzaId: pizza._id });
-      setCart(res.data.data); // Assuming backend returns full updated cart
+      const res = await API.post("/cart/add", {
+        pizzaId: pizza._id,
+        quantity, // send quantity
+      });
+      setCart(res.data.data); // assuming backend returns updated cart
     } catch (err) {
       console.error("Add to cart failed", err);
     }
   };
+
 
   // ✅ Remove from cart (calls backend)
   const removeFromCart = async (pizzaId) => {

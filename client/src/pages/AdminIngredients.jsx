@@ -105,7 +105,7 @@ const AdminIngredients = () => {
   const filteredIngredients = ingredients.filter((ing) => ing.type === selectedType);
 
   return (
-    <div className="p-16 max-w-full mx-auto bg-[#fff8f0]">
+    <div className="p-16 max-w-full min-h-[91vh] mx-auto bg-[#fff8f0]">
       <h2 className="text-3xl font-bold text-center text-red-600 mb-6 flex items-center justify-center gap-2">
         <FaListUl /> Manage Ingredients
       </h2>
