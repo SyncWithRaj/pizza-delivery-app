@@ -28,6 +28,8 @@ const MyOrders = () => {
     if (user) fetchOrders();
   }, [user]);
 
+  const sizePriceMap = { small: 30, medium: 40, large: 50 };
+
   if (!user) {
     return (
       <div className="p-6 text-center min-h-[60vh] flex items-center justify-center">
@@ -37,8 +39,7 @@ const MyOrders = () => {
   }
 
   return (
-    <div className="p-6 mx-auto min-h-[90vh] bg-[#fff8f0] ">
-      
+    <div className="p-6 mx-auto min-h-[90vh] bg-[#fff8f0]">
       <motion.h2
         className="text-3xl font-bold mb-10 text-center text-red-600 flex items-center justify-center gap-2"
         initial={{ opacity: 0, y: -20 }}
@@ -46,8 +47,7 @@ const MyOrders = () => {
         transition={{ duration: 0.5 }}
       >
         <div className="mt-16 flex items-center gap-2">
-
-        <FaPizzaSlice className="text-red-500" /> My Orders
+          <FaPizzaSlice className="text-red-500" /> My Orders
         </div>
       </motion.h2>
 
@@ -55,78 +55,101 @@ const MyOrders = () => {
         <p className="text-center text-gray-500 text-lg">You haven't placed any orders yet.</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-1 gap-8 max-w-3xl mx-auto">
-          {orders.map((order, index) => (
-            <motion.div
-              key={order._id}
-              className="border border-gray-200 rounded-2xl p-6 shadow-md bg-white hover:shadow-xl transition-all duration-300"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
-              {/* Status and Timestamp */}
-              <div className="flex flex-wrap justify-between items-center mb-4 gap-4">
-                <div className="flex gap-2 flex-wrap">
-                  <span
-                    className={`px-3 py-1 text-sm font-semibold rounded-full flex items-center gap-1 ${
-                      order.status === "placed"
-                        ? "bg-blue-100 text-blue-800"
-                        : order.status === "delivered"
-                        ? "bg-green-100 text-green-700"
-                        : "bg-gray-200 text-gray-700"
-                    }`}
-                  >
-                    <FaClock /> {order.status}
-                  </span>
-                  <span
-                    className={`px-3 py-1 text-sm font-semibold rounded-full flex items-center gap-1 ${
-                      order.paymentStatus === "paid"
-                        ? "bg-green-100 text-green-700"
-                        : "bg-yellow-100 text-yellow-800"
-                    }`}
-                  >
-                    <FaCheckCircle /> {order.paymentStatus}
-                  </span>
-                </div>
-                <div className="text-xs text-gray-500 flex items-center gap-1">
-                  <FaClock />
-                  {new Date(order.createdAt).toLocaleString()}
-                </div>
-              </div>
+          {orders.map((order, index) => {
+            const orderTotal = order.pizzas.reduce((sum, p) => {
+              const ingredientsTotal = (p.ingredients || []).reduce(
+                (acc, ing) => acc + (ing.price || 0),
+                0
+              );
+              const sizePrice = sizePriceMap[p.size] || 0;
+              const onePizzaPrice = sizePrice + ingredientsTotal;
+              return sum + onePizzaPrice * (p.quantity || 1);
+            }, 0);
 
-              {/* Address */}
-              <p className="text-gray-700 mb-4 flex items-center gap-2 text-sm">
-                <FaMapMarkerAlt className="text-red-500" />
-                <span className="font-medium">Address:</span> {order.deliveryAddress}
-              </p>
-
-              {/* Pizza List */}
-              <div>
-                <p className="font-semibold mb-2 text-gray-800 text-base flex items-center gap-2">
-                  <FaPizzaSlice className="text-yellow-500" /> Pizzas Ordered:
-                </p>
-                <ul className="space-y-2 pl-2 text-sm text-gray-700">
-                  {order.pizzas.map((pizza) => (
-                    <li
-                      key={pizza._id}
-                      className="flex justify-between items-center border-b pb-1"
+            return (
+              <motion.div
+                key={order._id}
+                className="border border-gray-200 rounded-2xl p-6 shadow-md bg-white hover:shadow-xl transition-all duration-300"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <div className="flex flex-wrap justify-between items-center mb-4 gap-4">
+                  <div className="flex gap-2 flex-wrap">
+                    <span
+                      className={`px-3 py-1 text-sm font-semibold rounded-full flex items-center gap-1 ${
+                        order.status === "placed"
+                          ? "bg-blue-100 text-blue-800"
+                          : order.status === "delivered"
+                          ? "bg-green-100 text-green-700"
+                          : "bg-gray-200 text-gray-700"
+                      }`}
                     >
-                      <span>
-                        {pizza.customName || "Custom Pizza"} ({pizza.size})
-                        {pizza.quantity > 1 && (
-                          <span className="ml-1 text-xs text-gray-500">
-                            × {pizza.quantity}
+                      <FaClock /> {order.status}
+                    </span>
+                    <span
+                      className={`px-3 py-1 text-sm font-semibold rounded-full flex items-center gap-1 ${
+                        order.paymentStatus === "paid"
+                          ? "bg-green-100 text-green-700"
+                          : "bg-yellow-100 text-yellow-800"
+                      }`}
+                    >
+                      <FaCheckCircle /> {order.paymentStatus}
+                    </span>
+                  </div>
+                  <div className="text-xs text-gray-500 flex items-center gap-1">
+                    <FaClock />
+                    {new Date(order.createdAt).toLocaleString()}
+                  </div>
+                </div>
+
+                <p className="text-gray-700 mb-4 flex items-center gap-2 text-sm">
+                  <FaMapMarkerAlt className="text-red-500" />
+                  <span className="font-medium">Address:</span> {order.deliveryAddress}
+                </p>
+
+                <div>
+                  <p className="font-semibold mb-2 text-gray-800 text-base flex items-center gap-2">
+                    <FaPizzaSlice className="text-yellow-500" /> Pizzas Ordered:
+                  </p>
+                  <ul className="space-y-2 pl-2 text-sm text-gray-700 mb-2">
+                    {order.pizzas.map((pizza) => {
+                      const qty = pizza.quantity || 1;
+                      const ingredientsTotal = (pizza.ingredients || []).reduce(
+                        (acc, ing) => acc + (ing.price || 0),
+                        0
+                      );
+                      const sizePrice = sizePriceMap[pizza.size] || 0;
+                      const onePizzaPrice = sizePrice + ingredientsTotal;
+                      const total = onePizzaPrice * qty;
+
+                      return (
+                        <li
+                          key={pizza._id}
+                          className="flex justify-between items-center border-b pb-1"
+                        >
+                          <span>
+                            {pizza.customName || "Custom Pizza"} ({pizza.size})
+                            {qty > 1 && (
+                              <span className="ml-1 text-xs text-gray-500">× {qty}</span>
+                            )}
                           </span>
-                        )}
-                      </span>
-                      <span className="text-green-700 font-medium flex items-center gap-1">
-                        <FaRupeeSign /> {pizza.totalPrice}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </motion.div>
-          ))}
+                          <span className="text-green-700 font-medium flex items-center gap-1">
+                            <FaRupeeSign />
+                            ₹{onePizzaPrice} × {qty} = ₹{total}
+                          </span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+
+                  <div className="text-right text-base font-semibold text-green-700 mt-2">
+                    Total Paid: ₹{orderTotal}
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
       )}
     </div>

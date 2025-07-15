@@ -59,103 +59,115 @@ const AdminOrders = () => {
         <p className="text-center text-gray-500 text-lg">No orders found.</p>
       ) : (
         <div className="grid grid-cols-1 gap-6 max-w-5xl mx-auto">
-          {orders.map((order) => (
-            <div
-              key={order._id}
-              className="bg-white rounded-2xl border shadow-md p-6 transition-all duration-300 hover:shadow-xl hover:scale-[1.01]"
-            >
-              {/* User Info + Date */}
-              <div className="flex flex-wrap justify-between items-center mb-3">
-                <div className="text-gray-800 font-semibold flex items-center gap-2">
-                  <FaUserAlt className="text-blue-600" />
-                  {order.user?.username} ({order.user?.email})
+          {orders.map((order) => {
+            const orderTotal = order.pizzas.reduce(
+              (sum, p) => sum + (p.totalPrice || 0) * (p.quantity || 1),
+              0
+            );
+
+            return (
+              <div
+                key={order._id}
+                className="bg-white rounded-2xl border shadow-md p-6 transition-all duration-300 hover:shadow-xl hover:scale-[1.01]"
+              >
+                {/* User Info + Date */}
+                <div className="flex flex-wrap justify-between items-center mb-3">
+                  <div className="text-gray-800 font-semibold flex items-center gap-2">
+                    <FaUserAlt className="text-blue-600" />
+                    {order.user?.username} ({order.user?.email})
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    {new Date(order.createdAt).toLocaleString()}
+                  </div>
                 </div>
-                <div className="text-sm text-gray-500">
-                  {new Date(order.createdAt).toLocaleString()}
+
+                {/* Status Badges */}
+                <div className="flex flex-wrap gap-2 mb-3">
+                  <span
+                    className={`text-xs px-3 py-1 rounded-full font-medium transition ${
+                      order.status === "delivered"
+                        ? "bg-green-100 text-green-700"
+                        : "bg-yellow-100 text-yellow-700"
+                    }`}
+                  >
+                    Status: {order.status}
+                  </span>
+                  <span
+                    className={`text-xs px-3 py-1 rounded-full font-medium ${
+                      order.paymentStatus === "paid"
+                        ? "bg-green-100 text-green-700"
+                        : "bg-red-100 text-red-700"
+                    }`}
+                  >
+                    Payment: {order.paymentStatus}
+                  </span>
                 </div>
-              </div>
 
-              {/* Status Badges */}
-              <div className="flex flex-wrap gap-2 mb-3">
-                <span
-                  className={`text-xs px-3 py-1 rounded-full font-medium transition ${
-                    order.status === "delivered"
-                      ? "bg-green-100 text-green-700"
-                      : "bg-yellow-100 text-yellow-700"
-                  }`}
-                >
-                  Status: {order.status}
-                </span>
-                <span
-                  className={`text-xs px-3 py-1 rounded-full font-medium ${
-                    order.paymentStatus === "paid"
-                      ? "bg-green-100 text-green-700"
-                      : "bg-red-100 text-red-700"
-                  }`}
-                >
-                  Payment: {order.paymentStatus}
-                </span>
-              </div>
-
-              {/* Address */}
-              <p className="mb-3 text-gray-700 flex gap-2 items-center">
-                <FaMapMarkedAlt className="text-gray-500" />
-                <span className="font-semibold">Address:</span>{" "}
-                {order.deliveryAddress}
-              </p>
-
-              {/* Pizza List */}
-              <div className="mb-4">
-                <p className="font-semibold text-gray-800 mb-2 flex items-center gap-1">
-                  <FaPizzaSlice /> Pizzas Ordered:
+                {/* Address */}
+                <p className="mb-3 text-gray-700 flex gap-2 items-center">
+                  <FaMapMarkedAlt className="text-gray-500" />
+                  <span className="font-semibold">Address:</span>{" "}
+                  {order.deliveryAddress}
                 </p>
-                <ul className="text-sm text-gray-700 space-y-1">
-                  {order.pizzas.map((p) => (
-                    <li
-                      key={p._id}
-                      className="flex justify-between border-b py-1"
-                    >
-                      <span>
-                        {p.customName || "Custom Pizza"} ({p.size})
-                      </span>
-                      <span className="text-green-700 font-medium">
-                        ₹{p.totalPrice}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
 
-              {/* Total Price */}
-              <p className="text-sm text-gray-800 font-medium flex items-center gap-2 mb-4">
-                <FaMoneyBill className="text-green-600" />
-                Total: ₹{order.totalPrice + 30}
-              </p>
+                {/* Pizza List */}
+                <div className="mb-4">
+                  <p className="font-semibold text-gray-800 mb-2 flex items-center gap-1">
+                    <FaPizzaSlice /> Pizzas Ordered:
+                  </p>
+                  <ul className="text-sm text-gray-700 space-y-1">
+                    {order.pizzas.map((p, i) => {
+                      const qty = p.quantity || 1;
+                      const total = (p.totalPrice || 0) * qty;
 
-              {/* Controls */}
-              <div className="flex flex-wrap items-center gap-4 mt-4">
-                <select
-                  value={order.status}
-                  onChange={(e) => updateStatus(order._id, e.target.value)}
-                  className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                >
-                  {["received", "in-kitchen", "out-for-delivery", "delivered"].map(
-                    (s) => (
+                      return (
+                        <li key={i} className="flex justify-between border-b py-1">
+                          <span>
+                            {p.customName || "Custom Pizza"} ({p.size || "N/A"})
+                            {qty > 1 && (
+                              <span className="ml-1 text-xs text-gray-500">
+                                × {qty}
+                              </span>
+                            )}
+                          </span>
+                          <span className="text-green-700 font-medium">
+                            ₹{p.totalPrice} × {qty} = ₹{total}
+                          </span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+
+                {/* Total Price */}
+                <p className="text-sm text-gray-800 font-medium flex items-center gap-2 mb-4">
+                  <FaMoneyBill className="text-green-600" />
+                  Total: ₹{orderTotal}
+                </p>
+
+                {/* Controls */}
+                <div className="flex flex-wrap items-center gap-4 mt-4">
+                  <select
+                    value={order.status}
+                    onChange={(e) => updateStatus(order._id, e.target.value)}
+                    className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                  >
+                    {["received", "in-kitchen", "out-for-delivery", "delivered"].map((s) => (
                       <option key={s} value={s}>
                         {s}
                       </option>
-                    )
-                  )}
-                </select>
-                <button
-                  onClick={() => deleteOrder(order._id)}
-                  className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm transition font-semibold"
-                >
-                  <FaTrash /> Delete
-                </button>
+                    ))}
+                  </select>
+                  <button
+                    onClick={() => deleteOrder(order._id)}
+                    className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm transition font-semibold"
+                  >
+                    <FaTrash /> Delete
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

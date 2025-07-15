@@ -1,3 +1,4 @@
+// models/order.model.js
 import mongoose, { Schema } from "mongoose";
 
 const orderSchema = new Schema(
@@ -5,11 +6,28 @@ const orderSchema = new Schema(
     user: {
       type: Schema.Types.ObjectId,
       ref: "User",
+      required: true,
     },
     pizzas: [
       {
-        type: Schema.Types.ObjectId,
-        ref: "Pizza",
+        pizza: {
+          type: Schema.Types.ObjectId,
+          ref: "Pizza",
+          required: true,
+        },
+        customName: String,
+        size: String,
+        ingredients: [
+          {
+            name: String,
+            price: Number,
+          },
+        ],
+        totalPrice: Number, // calculated dynamically
+        quantity: {
+          type: Number,
+          default: 1,
+        },
       },
     ],
     status: {
@@ -27,7 +45,6 @@ const orderSchema = new Schema(
       type: String,
       required: true,
     },
-
     totalPrice: {
       type: Number,
       required: true,

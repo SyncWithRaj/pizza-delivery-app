@@ -216,7 +216,7 @@ const CustomizePizza = () => {
           <span className="text-green-600 font-bold">₹{totalPrice * quantity}</span>
         </div>
 
-        {/* <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4">
           <label className="font-medium text-gray-700">Quantity:</label>
           <div className="flex items-center border rounded-lg overflow-hidden shadow-sm">
             <button
@@ -235,7 +235,7 @@ const CustomizePizza = () => {
               +
             </button>
           </div>
-        </div> */}
+        </div>
 
         <button
           type="submit"
