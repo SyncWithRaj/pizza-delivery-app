@@ -9,6 +9,7 @@ import {
   FaShoppingCart,
   FaTrash,
 } from "react-icons/fa";
+import MapPicker from "../components/MapPicker";
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -55,7 +56,7 @@ const Cart = () => {
     0
   );
 
-  const handleCheckout = async () => {
+  const handleCheckout = async (mode = "online") => {
     if (!address.trim()) {
       toast.error("Please enter delivery address");
       return;
@@ -68,9 +69,16 @@ const Cart = () => {
           quantity: p.quantity || 1,
         })),
         deliveryAddress: address,
+        paymentMode: mode,
       });
 
       const order = orderRes.data?.data;
+
+      if (mode === "cod") {
+        await API.delete("/cart/clear");
+        toast.success("Order placed successfully. Pay on delivery.");
+        return navigate("/my-orders");
+      }
 
       const razorRes = await API.post("/razorpay/create-order", {
         amount: totalPrice,
@@ -194,6 +202,8 @@ const Cart = () => {
               })}
             </div>
 
+            <MapPicker onAddressSelect={(addr) => setAddress(addr)} />
+
             <div className="mb-6">
               <label className="mb-1 font-medium text-gray-700 flex items-center gap-2">
                 <FaMapMarkerAlt className="text-red-500" /> Delivery Address
@@ -215,12 +225,21 @@ const Cart = () => {
                   <FaRupeeSign /> {totalPrice}
                 </span>
               </div>
-              <button
-                onClick={handleCheckout}
-                className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-full text-lg font-semibold transition duration-300"
-              >
-                Proceed to Pay
-              </button>
+
+              <div className="flex flex-col sm:flex-row gap-4 items-center">
+                <button
+                  onClick={() => handleCheckout("online")}
+                  className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-full text-lg font-semibold transition duration-300 w-full sm:w-auto"
+                >
+                  Pay Online
+                </button>
+                <button
+                  onClick={() => handleCheckout("cod")}
+                  className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-full text-lg font-semibold transition duration-300 w-full sm:w-auto"
+                >
+                  Pay on Delivery
+                </button>
+              </div>
             </div>
           </>
         )}
