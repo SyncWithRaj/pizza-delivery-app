@@ -3,26 +3,32 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
-// ✅ Get Cart
 export const getCart = asyncHandler(async (req, res) => {
-  const cart = await Cart.findOne({ user: req.user._id })
-    .populate({
-      path: "pizzas.pizza",
-      populate: { path: "ingredients" }, // 🧠 nested population
-    });
+  const cart = await Cart.findOne({ user: req.user._id }).populate({
+    path: "pizzas.pizza",
+    populate: { path: "ingredients" },
+  });
 
   if (!cart) {
-    return res.status(200).json(new ApiResponse(200, { pizzas: [] }, "Cart is empty"));
+    return res
+      .status(200)
+      .json(new ApiResponse(200, { pizzas: [] }, "Cart is empty"));
   }
 
-  const cartItems = cart.pizzas.map((item) => ({
-    ...item.pizza.toObject(),
-    quantity: item.quantity,
-  }));
+  const cartItems = cart.pizzas
+    .map((item) => {
+      if (!item.pizza) return null; // pizza was deleted from DB
+      return {
+        ...item.pizza.toObject(),
+        quantity: item.quantity,
+      };
+    })
+    .filter(Boolean); // remove nulls from list
 
-  res.status(200).json(new ApiResponse(200, { pizzas: cartItems }));
+  res
+    .status(200)
+    .json(new ApiResponse(200, { pizzas: cartItems }, "Cart fetched successfully"));
 });
-
 
 // ✅ Add/Update Item to Cart
 export const addToCart = asyncHandler(async (req, res) => {

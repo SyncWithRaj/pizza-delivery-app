@@ -24,7 +24,7 @@ const ForgotPassword = () => {
           <FaEnvelope /> Forgot Password?
         </h2>
         <p className="text-center text-sm text-gray-600">
-          We'll send you a reset link on your email.
+          We'll send you a reset link on your registered email.
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">

@@ -3,6 +3,7 @@ import { Pizza } from "../models/pizza.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import { Ingredient } from "../models/ingredient.model.js"; // ✅ Import
 
 export const createOrder = asyncHandler(async (req, res) => {
   const { pizzas, deliveryAddress } = req.body;
@@ -15,10 +16,7 @@ export const createOrder = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Delivery address is required");
   }
 
-  // ✅ Extract pizza IDs from Cart payload
   const pizzaIds = pizzas.map((p) => p.pizza);
-
-  // ✅ Fetch pizza docs and populate ingredients
   const pizzaDocs = await Pizza.find({ _id: { $in: pizzaIds } }).populate("ingredients");
 
   if (pizzaDocs.length !== pizzaIds.length) {
@@ -27,8 +25,9 @@ export const createOrder = asyncHandler(async (req, res) => {
 
   const sizePriceMap = { small: 30, medium: 40, large: 50 };
 
-  // ✅ Build Order Pizza Array with dynamic price
-  const orderPizzas = pizzas.map((item) => {
+  const orderPizzas = [];
+
+  for (const item of pizzas) {
     const matchedPizza = pizzaDocs.find(
       (doc) => doc._id.toString() === item.pizza
     );
@@ -45,24 +44,34 @@ export const createOrder = asyncHandler(async (req, res) => {
     const sizePrice = sizePriceMap[matchedPizza.size] || 0;
     const ingredientsTotal = ingredients.reduce((acc, ing) => acc + (ing.price || 0), 0);
     const onePizzaPrice = sizePrice + ingredientsTotal;
+    const quantity = item.quantity || 1;
 
-    return {
+    // ✅ DECREASE STOCK for each ingredient used
+    for (const ing of matchedPizza.ingredients) {
+      if (ing.stock < quantity) {
+        throw new ApiError(400, `Not enough stock for ingredient: ${ing.name}`);
+      }
+
+      await Ingredient.findByIdAndUpdate(ing._id, {
+        $inc: { stock: -quantity },
+      });
+    }
+
+    orderPizzas.push({
       pizza: matchedPizza._id,
       customName: matchedPizza.customName || "Custom Pizza",
       size: matchedPizza.size,
       ingredients,
       totalPrice: onePizzaPrice,
-      quantity: item.quantity || 1,
-    };
-  });
+      quantity,
+    });
+  }
 
-  // ✅ Calculate order total
   const totalPrice = orderPizzas.reduce(
     (sum, p) => sum + p.totalPrice * p.quantity,
     0
   );
 
-  // ✅ Create Order
   const order = await Order.create({
     user: req.user._id,
     pizzas: orderPizzas,

@@ -5,8 +5,9 @@ import API from "../services/api";
 import toast from "react-hot-toast";
 import { FaShoppingCart, FaStar } from "react-icons/fa";
 import { motion } from "framer-motion";
+import { FaPizzaSlice, FaLeaf, FaFire, FaRocket, FaSmileWink } from "react-icons/fa"
 
-// ✅ Replace with real MongoDB _ids
+
 const popularItems = [
   {
     id: 1,
@@ -66,13 +67,13 @@ const Home = () => {
 
   return (
     <div className="bg-[#fff8f0] text-gray-800 -mt-19 overflow-x-hidden">
+
       {/* Hero Section */}
       <section
         className="relative bg-cover bg-center h-[102vh] grid grid-cols-1 md:grid-cols-2"
         style={{ backgroundImage: "url('/images/home.jpg')" }}
       >
         <div className="absolute inset-0 bg-opacity-50 z-0" />
-
         <div></div>
 
         <motion.div
@@ -82,12 +83,18 @@ const Home = () => {
           className="relative z-10 flex items-center justify-center px-6 md:px-16"
         >
           <div className="text-center max-w-4xl space-y-6 backdrop-blur-sm p-8 rounded-xl">
-            <h1 className="text-4xl md:text-5xl font-extrabold text-white drop-shadow-lg">
-              Welcome to PizzaScript 🍕
-            </h1>
+            <div className="perspective text-white font-extrabold drop-shadow-lg">
+              <div className="cube-animation">
+                <div className="cube-face">Welcome to PizzaScript 🍕</div>
+                <div className="cube-face">Build Your Dream Pizza</div>
+                <div className="cube-face">Code Meets Crust 💻🍕</div>
+              </div>
+            </div>
+
             <p className="text-lg md:text-xl text-gray-200 drop-shadow">
               Where code meets crust – build your dream pizza with just a few clicks!
             </p>
+
             <Link
               to={user ? "/customize" : "/login"}
               className="inline-block bg-red-500 hover:bg-red-600 text-white px-8 py-3 rounded-full text-lg font-semibold transition-all shadow-lg hover:scale-105"
@@ -98,8 +105,24 @@ const Home = () => {
         </motion.div>
       </section>
 
+      <div className="w-full overflow-hidden bg-white py-4 -mt-34 shadow-md rotate-[-2deg]">
+        <div
+          className="flex animate-marquee gap-16 text-black text-4xl font-semibold px-4"
+          style={{ fontFamily: "'Rubik Burned', cursive", whiteSpace: "nowrap" }}
+        >
+          {/* First loop */}
+          <span>🍕 Discover our most loved pizzas • 🍄 Fresh Ingredients • 🔥 Hot & Fast Delivery •</span>
+          <span>🍕 Discover our most loved pizzas • 🍄 Fresh Ingredients • 🔥 Hot & Fast Delivery •</span>
+
+          {/* Repeat for seamless loop */}
+          <span>🍕 Discover our most loved pizzas • 🍄 Fresh Ingredients • 🔥 Hot & Fast Delivery •</span>
+          <span>🍕 Discover our most loved pizzas • 🍄 Fresh Ingredients • 🔥 Hot & Fast Delivery •</span>
+        </div>
+      </div>
+
+
       {/* Popular Picks */}
-      <section className="py-20 px-6 max-w-6xl mx-auto">
+      <section className="py-20 pt-24 px-6 max-w-6xl mx-auto">
         <h2 className="text-5xl font-bold mb-12 text-center flex justify-center items-center gap-2">
           <FaStar className="text-yellow-400" />
           Popular Picks

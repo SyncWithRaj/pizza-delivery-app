@@ -52,12 +52,14 @@ export const createPizza = asyncHandler(async (req, res) => {
   res.status(201).json(new ApiResponse(201, pizza, "Pizza created successfully"));
 });
 
-
-
 export const getAllPizzas = asyncHandler(async (req, res) => {
-  const pizzas = await Pizza.find().populate("user", "username").populate("ingredients", "name");
+  const pizzas = await Pizza.find()
+    .populate("user", "username")
+    .populate("ingredients", "name price"); // ✅ important fix
+
   res.status(200).json(new ApiResponse(200, pizzas));
 });
+
 
 export const getMyPizzas = asyncHandler(async (req, res) => {
   const pizzas = await Pizza.find({ user: req.user._id }).populate("ingredients", "name");

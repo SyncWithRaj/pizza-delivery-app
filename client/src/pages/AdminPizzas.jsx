@@ -67,8 +67,11 @@ const AdminPizzas = () => {
               <div className="flex justify-between text-gray-700 text-sm font-medium">
                 <p className="flex items-center gap-1">
                   <FaRupeeSign className="text-green-600" />
-                  Price: ₹{pizza.totalPrice}
+                  Price: ₹
+                  {pizza.ingredients.reduce((sum, ing) => sum + (ing.price || 0), 0) +
+                    (pizza.size === "medium" ? 40 : pizza.size === "large" ? 50 : 30)}
                 </p>
+
                 <p className="flex items-center gap-1">
                   <FaArrowsAltH className="text-yellow-600" />
                   Size: {pizza.size}

@@ -12,10 +12,10 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.resolve(__dirname, ".env") });
 
 // 🔍 Debug logs (optional)
-console.log("🧪 MONGODB_URI:", process.env.MONGODB_URI);
+// console.log("🧪 MONGODB_URI:", process.env.MONGODB_URI);
 console.log("🧪 PORT:", process.env.PORT);
-console.log("ACCESS_TOKEN_SECRET:", process.env.ACCESS_TOKEN_SECRET);
-console.log("REFRESH_TOKEN_SECRET:", process.env.REFRESH_TOKEN_SECRET);
+// console.log("ACCESS_TOKEN_SECRET:", process.env.ACCESS_TOKEN_SECRET);
+// console.log("REFRESH_TOKEN_SECRET:", process.env.REFRESH_TOKEN_SECRET);
 
 connectDB()
   .then(() => {

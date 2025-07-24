@@ -58,10 +58,9 @@ const AdminIngredients = () => {
     }
 
     try {
-      // Upload image to Cloudinary
       const formData = new FormData();
       formData.append("file", imageFile);
-      formData.append("upload_preset", "pizza_ingredient_upload"); // ✅ This line is important
+      formData.append("upload_preset", "pizza_ingredient_upload");
 
       const cloudRes = await fetch("https://api.cloudinary.com/v1_1/mrcoderraj/image/upload", {
         method: "POST",
@@ -71,8 +70,6 @@ const AdminIngredients = () => {
       const cloudData = await cloudRes.json();
       const imageUrl = cloudData.secure_url;
 
-
-      // Save ingredient with image URL
       const res = await API.post("/ingredients", {
         name,
         type,
@@ -92,7 +89,13 @@ const AdminIngredients = () => {
   };
 
   useEffect(() => {
-    fetchIngredients();
+    fetchIngredients(); // Initial fetch
+
+    const interval = setInterval(() => {
+      fetchIngredients(); // Auto-refresh every 10 sec
+    }, 10000);
+
+    return () => clearInterval(interval); // Cleanup
   }, []);
 
   const tabItems = [
@@ -170,16 +173,27 @@ const AdminIngredients = () => {
         </button>
       </form>
 
+      {/* Refresh Button */}
+      <div className="flex justify-end max-w-5xl mx-auto mb-2">
+        <button
+          onClick={fetchIngredients}
+          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1 rounded transition text-sm"
+        >
+          🔄 Refresh Stocks
+        </button>
+      </div>
+
       {/* Tab Menu */}
       <div className="flex justify-center gap-4 mb-6 max-w-5xl mx-auto">
         {tabItems.map((tab) => (
           <button
             key={tab.type}
             onClick={() => setSelectedType(tab.type)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold transition ${selectedType === tab.type
+            className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold transition ${
+              selectedType === tab.type
                 ? "bg-red-600 text-white"
                 : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-              }`}
+            }`}
           >
             {tab.icon} {tab.label}
           </button>
@@ -204,7 +218,7 @@ const AdminIngredients = () => {
                 <FaTrash /> Delete
               </button>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-gray-700 text-sm">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
               <p className="flex items-center gap-2">
                 <strong>Type:</strong> {ing.type}
               </p>
@@ -212,8 +226,12 @@ const AdminIngredients = () => {
                 <FaMoneyBillWave className="text-green-600" />
                 <strong>Price:</strong> ₹{ing.price}
               </p>
-              <p className="flex items-center gap-2">
-                <FaBoxes className="text-yellow-600" />
+              <p
+                className={`flex items-center gap-2 ${
+                  ing.stock < 10 ? "text-red-600 font-semibold" : "text-gray-700"
+                }`}
+              >
+                <FaBoxes className={`${ing.stock < 10 ? "text-red-600" : "text-yellow-600"}`} />
                 <strong>Stock:</strong> {ing.stock}
               </p>
             </div>

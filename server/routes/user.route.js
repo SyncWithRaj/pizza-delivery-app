@@ -10,7 +10,6 @@ const router = express.Router();
 router.get("/", verifyJWT, checkRole("admin"), getAllUsers);
 router.post("/send-otp", verifyJWT, sendOtp)
 router.put("/update", verifyJWT, verifyOtpAndUpdate);
-// ✅ For deleting own account
 router.delete("/:id", verifyJWT, deleteUser);
 
 export default router;

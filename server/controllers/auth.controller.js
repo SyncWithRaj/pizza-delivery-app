@@ -170,7 +170,6 @@ const getCurrentUser = asyncHandler(async (req, res) => {
     res.status(200).json(new ApiResponse(200, user, "User fetched successfully"));
 });
 
-
 const forgotPasswordController = asyncHandler(async (req, res) => {
     const { email } = req.body;
     if (!email) throw new ApiError(400, "Email is required");
