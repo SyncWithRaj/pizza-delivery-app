@@ -20,14 +20,13 @@ export const createIngredient = asyncHandler(async (req, res) => {
     price,
     type,
     stock,
-    image, // ✅ directly take from req.body
+    image,
   });
 
   res
     .status(201)
     .json(new ApiResponse(201, ingredient, "Ingredient created with image"));
 });
-
 
 // ✅ Get All Ingredients (public)
 export const getAllIngredients = asyncHandler(async (req, res) => {
@@ -40,4 +39,22 @@ export const deleteIngredient = asyncHandler(async (req, res) => {
   const ingredient = await Ingredient.findByIdAndDelete(req.params.id);
   if (!ingredient) throw new ApiError(404, "Ingredient not found");
   res.status(200).json(new ApiResponse(200, null, "Ingredient deleted"));
+});
+
+// ✅ Update stock of an ingredient (admin)
+export const updateIngredientStock = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { quantity } = req.body;
+
+  if (!quantity || quantity <= 0) {
+    throw new ApiError(400, "Invalid quantity");
+  }
+
+  const ingredient = await Ingredient.findById(id);
+  if (!ingredient) throw new ApiError(404, "Ingredient not found");
+
+  ingredient.stock += quantity;
+  await ingredient.save();
+
+  res.status(200).json(new ApiResponse(200, ingredient, "Stock updated"));
 });

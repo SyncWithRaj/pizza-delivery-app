@@ -88,14 +88,34 @@ const AdminIngredients = () => {
     }
   };
 
+  const addStockToIngredient = async (id) => {
+    const quantityToAdd = prompt("Enter stock quantity to add:");
+    const quantity = Number(quantityToAdd);
+
+    if (!quantity || quantity <= 0) {
+      toast.error("Invalid quantity");
+      return;
+    }
+
+    try {
+      const res = await API.patch(`/ingredients/${id}/stock`, { quantity });
+      setIngredients((prev) =>
+        prev.map((ing) => (ing._id === id ? { ...ing, stock: res.data.data.stock } : ing))
+      );
+      toast.success("Stock updated!");
+    } catch {
+      toast.error("Failed to update stock");
+    }
+  };
+
   useEffect(() => {
-    fetchIngredients(); // Initial fetch
+    fetchIngredients();
 
     const interval = setInterval(() => {
-      fetchIngredients(); // Auto-refresh every 10 sec
+      fetchIngredients();
     }, 10000);
 
-    return () => clearInterval(interval); // Cleanup
+    return () => clearInterval(interval);
   }, []);
 
   const tabItems = [
@@ -234,6 +254,14 @@ const AdminIngredients = () => {
                 <FaBoxes className={`${ing.stock < 10 ? "text-red-600" : "text-yellow-600"}`} />
                 <strong>Stock:</strong> {ing.stock}
               </p>
+            </div>
+            <div className="mt-3">
+              <button
+                onClick={() => addStockToIngredient(ing._id)}
+                className="text-sm bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded"
+              >
+                ➕ Add Stock
+              </button>
             </div>
           </div>
         ))}

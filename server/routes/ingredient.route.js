@@ -2,7 +2,8 @@ import express from "express";
 import {
   createIngredient,
   getAllIngredients,
-  deleteIngredient
+  deleteIngredient,
+  updateIngredientStock
 } from "../controllers/ingredient.controller.js";
 import { verifyJWT } from "../middleware/auth.middleware.js";
 import { checkRole } from "../middleware/checkRole.js";
@@ -16,5 +17,6 @@ router.use(verifyJWT, checkRole("admin"));
 
 router.post("/", upload.single("image"), createIngredient);
 router.delete("/:id", deleteIngredient);
+router.patch("/:id/stock", updateIngredientStock);
 
 export default router;

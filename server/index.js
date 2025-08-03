@@ -3,6 +3,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import connectDB from "./config/db.config.js";
 import { app } from "./app.js";
+import { monitorIngredientStock } from "./cronJobs/ingredientMonitor.js";
 
 // 📍 Fix for ESM __dirname (mandatory for dotenv path)
 const __filename = fileURLToPath(import.meta.url);
@@ -21,6 +22,7 @@ connectDB()
   .then(() => {
     app.listen(process.env.PORT || 8000, () => {
       console.log(`🚀 Server is running at port: ${process.env.PORT}`);
+       monitorIngredientStock(); 
     });
   })
   .catch((err) => {
