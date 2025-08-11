@@ -39,7 +39,7 @@ const Navbar = () => {
           className="text-2xl font-extrabold text-red-600 flex items-center gap-2 hover:scale-105 transition-transform duration-300"
         >
           <img src="/images/logo.png" alt="Logo" className="h-10 w-10 object-contain" />
-          <span className="text-gray-800 text-3xl">PizzaScript</span>
+          <span className="text-gray-800 text-3xl">PizzaVibe</span>
         </Link>
 
         {/* Links */}

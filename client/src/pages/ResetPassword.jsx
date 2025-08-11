@@ -23,14 +23,11 @@ const ResetPassword = () => {
       return;
     }
 
-    try {
       await API.post(`/auth/reset-password/${token}`, { password });
       toast.success("Password reset successfully!");
-      navigate("/login");
-    } catch (err) {
-      console.error(err);
-      toast.error(err.response?.data?.message || "Reset failed");
-    }
+      navigate("/");
+      // await API.post("/auth/logout");
+      // setUser(null);
   };
 
   return (

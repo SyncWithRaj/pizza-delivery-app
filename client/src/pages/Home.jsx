@@ -152,7 +152,7 @@ const Home = () => {
           <div className="text-center max-w-4xl space-y-6 backdrop-blur-sm p-8 rounded-xl">
             <div className="perspective text-white font-extrabold drop-shadow-lg">
               <div className="cube-animation">
-                <div className="cube-face">Welcome to PizzaScript 🍕</div>
+                <div className="cube-face">Welcome to PizzaVibe 🍕</div>
                 <div className="cube-face">Build Your Dream Pizza</div>
                 <div className="cube-face">Code Meets Crust 💻🍕</div>
               </div>
@@ -245,7 +245,7 @@ const Home = () => {
 
           {/* About */}
           <div>
-            <h4 className="font-bold mb-3">ABOUT PIZZASCRIPT</h4>
+            <h4 className="font-bold mb-3">ABOUT PIZZAVIBE</h4>
             <ul className="space-y-2 text-sm">
               <li><a href="#" className="hover:underline">Who We Are</a></li>
               <li><a href="#" className="hover:underline">Blog</a></li>
@@ -261,7 +261,7 @@ const Home = () => {
           <div>
             <h4 className="font-bold mb-3">PIZZAVERSE</h4>
             <ul className="space-y-2 text-sm">
-              <li><a href="#" className="hover:underline">PizzaScript</a></li>
+              <li><a href="#" className="hover:underline">PizzaVibe</a></li>
               <li><a href="#" className="hover:underline">FastCrust</a></li>
               <li><a href="#" className="hover:underline">CheeseLand</a></li>
               <li><a href="#" className="hover:underline">Feeding Smiles</a></li>
@@ -316,7 +316,7 @@ const Home = () => {
         {/* Bottom Bar */}
         <div className="border-t py-6 px-6 text-sm text-center text-gray-500">
           <p>By continuing past this page, you agree to our Terms of Service, Cookie Policy, Privacy Policy and Content Policies.</p>
-          <p className="mt-2">2025 © PizzaScript™. All rights reserved.</p>
+          <p className="mt-2">2025 © PizzaVibe. All rights reserved.</p>
         </div>
       </footer>
 

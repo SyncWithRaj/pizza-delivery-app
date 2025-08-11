@@ -19,7 +19,7 @@ export const sendOtp = asyncHandler(async (req, res) => {
     await transporter.sendMail({
         from: process.env.SMTP_USER,
         to: email,
-        subject: "Your OTP - PizzaScript",
+        subject: "Your OTP - PizzaVibe",
         html: `<h2>Your OTP is: ${otpCode}</h2><p>Expires in 10 minutes.</p>`,
     });
 

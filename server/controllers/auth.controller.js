@@ -188,18 +188,18 @@ const forgotPasswordController = asyncHandler(async (req, res) => {
 
     // Send Email
     await transporter.sendMail({
-        from: `"PizzaScript Support" <${process.env.SMTP_USER}>`,
+        from: `"PizzaVibe Support" <${process.env.SMTP_USER}>`,
         to: user.email,
-        subject: "Reset Your Password - PizzaScript 🍕",
+        subject: "Reset Your Password - PizzaVibe 🍕",
         html: `
       <h2>Hello ${user.fullName},</h2>
-      <p>You recently requested to reset your PizzaScript password.</p>
+      <p>You recently requested to reset your PizzaVibe password.</p>
       <p>Click the link below to reset your password. This link will expire in 1 hour:</p>
       <a href="${resetUrl}" style="display: inline-block; padding: 10px 20px; background-color: #ef4444; color: white; border-radius: 5px; text-decoration: none;">Reset Password</a>
       <p>If you didn't request this, you can ignore this email.</p>
       <br/>
       <p>🍕 With love,</p>
-      <strong>Team PizzaScript</strong>
+      <strong>Team PizzaVibe</strong>
     `,
     });
 
@@ -239,7 +239,7 @@ const sendLoginOtp = asyncHandler(async (req, res) => {
   await transporter.sendMail({
     from: process.env.SMTP_USER,
     to: email,
-    subject: "Login OTP - PizzaScript",
+    subject: "Login OTP - PizzaVibe",
     html: `<h2>Your OTP is: ${otpCode}</h2><p>Valid for 10 minutes.</p>`,
   });
 
