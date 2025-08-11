@@ -6,7 +6,8 @@ import toast from "react-hot-toast";
 import { FaShoppingCart, FaStar } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { FaPizzaSlice, FaLeaf, FaFire, FaRocket, FaSmileWink } from "react-icons/fa"
-
+import { FaFacebookF, FaInstagram, FaYoutube, FaLinkedinIn, FaTwitter } from "react-icons/fa";
+import PopularPicks from '../components/PopularPicks';
 
 const popularItems = [
   {
@@ -36,7 +37,71 @@ const popularItems = [
     ingredients: ["6873d51705c195e991d59e53", "6873d77d05c195e991d59e8d", "6873d6a705c195e991d59e77", "6873d5d505c195e991d59e69", "6873d81a05c195e991d59e99"],
     size: "large",
   },
+  {
+    id: 4,
+    name: "Margherita Classic",
+    rating: 4.6,
+    price: 150,
+    image: "/images/margherita.jpg",
+    ingredients: ["6873d4d905c195e991d59e4b", "6873d63605c195e991d59e73"],
+    size: "small",
+  },
+  {
+    id: 5,
+    name: "BBQ Chicken Feast",
+    rating: 4.8,
+    price: 220,
+    image: "/images/bbq-chicken.jpg",
+    ingredients: ["6873d54d05c195e991d59e59", "6873d6fb05c195e991d59e81", "6873d5b905c195e991d59e65"],
+    size: "large",
+  },
+  {
+    id: 6,
+    name: "Pepperoni Delight",
+    rating: 4.7,
+    price: 210,
+    image: "/images/pepperoni.jpg",
+    ingredients: ["6873d54d05c195e991d59e59", "6873d7db05c195e991d59e95"],
+    size: "medium",
+  },
+  {
+    id: 7,
+    name: "Mexican Wave",
+    rating: 4.8,
+    price: 200,
+    image: "/images/mexican.jpg",
+    ingredients: ["6873d5d505c195e991d59e69", "6873d6a705c195e991d59e77", "6873d7db05c195e991d59e95"],
+    size: "large",
+  },
+  {
+    id: 8,
+    name: "Farmhouse Special",
+    rating: 4.9,
+    price: 190,
+    image: "/images/farmhouse.jpg",
+    ingredients: ["6873d51705c195e991d59e53", "6873d81a05c195e991d59e99", "6873d6a705c195e991d59e77"],
+    size: "medium",
+  },
+  {
+    id: 9,
+    name: "Peri Peri Veg",
+    rating: 4.7,
+    price: 185,
+    image: "/images/peri-peri.jpg",
+    ingredients: ["6873d5b905c195e991d59e65", "6873d77d05c195e991d59e8d", "6873d81a05c195e991d59e99"],
+    size: "medium",
+  },
+  {
+    id: 10,
+    name: "Tandoori Paneer",
+    rating: 4.8,
+    price: 205,
+    image: "/images/tandoori-paneer.jpg",
+    ingredients: ["6873d54d05c195e991d59e59", "6873d6fb05c195e991d59e81", "6873d7db05c195e991d59e95", "6873d5d505c195e991d59e69"],
+    size: "large",
+  },
 ];
+
 
 const Home = () => {
   const { user } = useAuth();
@@ -64,6 +129,8 @@ const Home = () => {
       toast.error("Failed to add to cart");
     }
   };
+
+
 
   return (
     <div className="bg-[#fff8f0] text-gray-800 -mt-19 overflow-x-hidden">
@@ -122,7 +189,7 @@ const Home = () => {
 
 
       {/* Popular Picks */}
-      <section className="py-20 pt-24 px-6 max-w-6xl mx-auto">
+      {/* <section className="py-20 pt-24 px-6 max-w-6xl mx-auto">
         <h2 className="text-5xl font-bold mb-12 text-center flex justify-center items-center gap-2">
           <FaStar className="text-yellow-400" />
           Popular Picks
@@ -164,7 +231,97 @@ const Home = () => {
             </motion.div>
           ))}
         </div>
-      </section>
+      </section> */}
+
+      <PopularPicks
+        popularItems={popularItems}
+        handleAddPopularToCart={handleAddPopularToCart}
+      />
+
+
+      {/* Footer */}
+      <footer className="bg-[#ede2d6] text-gray-700 mt-12 border-t">
+        <div className="max-w-7xl mx-auto px-6 py-10 grid grid-cols-2 md:grid-cols-5 gap-8">
+
+          {/* About */}
+          <div>
+            <h4 className="font-bold mb-3">ABOUT PIZZASCRIPT</h4>
+            <ul className="space-y-2 text-sm">
+              <li><a href="#" className="hover:underline">Who We Are</a></li>
+              <li><a href="#" className="hover:underline">Blog</a></li>
+              <li><a href="#" className="hover:underline">Work With Us</a></li>
+              <li><a href="#" className="hover:underline">Investor Relations</a></li>
+              <li><a href="#" className="hover:underline">Report Fraud</a></li>
+              <li><a href="#" className="hover:underline">Press Kit</a></li>
+              <li><a href="#" className="hover:underline">Contact Us</a></li>
+            </ul>
+          </div>
+
+          {/* PizzaVerse */}
+          <div>
+            <h4 className="font-bold mb-3">PIZZAVERSE</h4>
+            <ul className="space-y-2 text-sm">
+              <li><a href="#" className="hover:underline">PizzaScript</a></li>
+              <li><a href="#" className="hover:underline">FastCrust</a></li>
+              <li><a href="#" className="hover:underline">CheeseLand</a></li>
+              <li><a href="#" className="hover:underline">Feeding Smiles</a></li>
+              <li><a href="#" className="hover:underline">Pizza Live</a></li>
+              <li><a href="#" className="hover:underline">PizzaFest</a></li>
+            </ul>
+          </div>
+
+          {/* For Restaurants */}
+          <div>
+            <h4 className="font-bold mb-3">FOR RESTAURANTS</h4>
+            <ul className="space-y-2 text-sm">
+              <li><a href="#" className="hover:underline">Partner With Us</a></li>
+              <li><a href="#" className="hover:underline">Apps For You</a></li>
+            </ul>
+          </div>
+
+          {/* Learn More */}
+          <div>
+            <h4 className="font-bold mb-3">LEARN MORE</h4>
+            <ul className="space-y-2 text-sm">
+              <li><a href="#" className="hover:underline">Privacy</a></li>
+              <li><a href="#" className="hover:underline">Security</a></li>
+              <li><a href="#" className="hover:underline">Terms</a></li>
+            </ul>
+          </div>
+
+          {/* Social Links */}
+          <div>
+            <h4 className="font-bold mb-3">SOCIAL LINKS</h4>
+            <div className="flex space-x-4 text-2xl mb-4">
+              <a href="https://www.linkedin.com/in/raj-ribadiya/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500">
+                <FaLinkedinIn />
+              </a>
+              <a href="https://www.instagram.com/ribadiya_raj/" target="_blank" rel="noopener noreferrer" className="hover:text-pink-500">
+                <FaInstagram />
+              </a>
+              <a href="https://x.com/ribadiya_rajj" target="_blank" rel="noopener noreferrer" className="hover:text-indigo-500">
+                <FaTwitter />
+              </a>
+              <a href="#" target="_blank" rel="noopener noreferrer" className="hover:text-red-500">
+                <FaYoutube />
+              </a>
+              <a href="#" target="_blank" rel="noopener noreferrer" className="hover:text-blue-600">
+                <FaFacebookF />
+              </a>
+
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Bar */}
+        <div className="border-t py-6 px-6 text-sm text-center text-gray-500">
+          <p>By continuing past this page, you agree to our Terms of Service, Cookie Policy, Privacy Policy and Content Policies.</p>
+          <p className="mt-2">2025 © PizzaScript™. All rights reserved.</p>
+        </div>
+      </footer>
+
+
+
     </div>
   );
 };

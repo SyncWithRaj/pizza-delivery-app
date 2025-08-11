@@ -32,8 +32,8 @@ const orderSchema = new Schema(
     ],
     status: {
       type: String,
-      enum: ["received", "in-kitchen", "out-for-delivery", "delivered"],
-      default: "received",
+      enum: ["order-received", "in-kitchen", "out-for-delivery", "delivered"],
+      default: "order-received",
     },
     paymentStatus: {
       type: String,

@@ -109,7 +109,7 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
   const { status, paymentStatus, paymentId } = req.body;
 
   const validStatuses = [
-    "received",
+    "order-received",
     "in-kitchen",
     "out-for-delivery",
     "delivered",
