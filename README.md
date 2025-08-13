@@ -10,23 +10,27 @@ This application provides a **seamless pizza ordering experience** for customers
 It supports **pizza customization**, **dynamic pricing**, **secure payment processing**, and **real-time order tracking**.
 
 ---
+# Features:
 
-## 🚀 Features
+### 👤 For Users
+- 🔐 **User Authentication** – JWT-based login, registration, and logout
+- ✉️ **OTP Verification** – Email-based OTP verification during signup
+- 📩 **Login with OTP** – Quick access without a password
+- 🔄 **Forgot Password via Email Reset Link** – Secure password reset flow
+- 🍕 **Make Your Own Pizza** – Choose base, sauce, cheese, veggies, and quantity
+- 💰 **Dynamic Price Calculation** – Real-time price update based on size & ingredients
+- 🛒 **Cart Management** – Add, remove, and update items before checkout
+- 💳 **Secure Payment Integration** – Razorpay (test mode) for seamless checkout
+- 📜 **My Orders** – View past orders with a detailed price breakdown
+- ⏳ **Real-Time Order Tracking** – Live status updates from order placed to delivered
 
-### **For Users**
-- 🔐 **User Authentication** (JWT-based login, registration, logout)
-- 🍕 **Pizza Customization** – Choose base, sauce, cheese, veggies, and quantity
-- 💰 **Dynamic Price Calculation**
-- 🛒 **Cart Management** – Add, remove, update items before checkout
-- 💳 **Secure Payment** – Integrated with Razorpay (test mode)
-- 📜 **My Orders** – View past orders with detailed breakdown
-
-### **For Admins**
-- 🖥 **Admin Dashboard** – Role-based access control
-- 📊 **Dynamic Charts & Analytics** – Revenue, orders, popular pizzas
-- 🛠 **Pizza & Ingredient Management** – Add, edit, delete
-- 👥 **User Management**
-- 🔄 **Real-Time Order Status Updates**
+### 🛠 For Admins
+- 🖥 **Admin Dashboard** – Role-based access control  
+- 🛠 **Pizza & Ingredient Management** – Add, edit, delete pizzas & ingredients
+- 👥 **User Management** – View and manage registered users
+- 📦 **Order Management** – Update order statuses in real-time
+- ☁️ **Image Upload via Cloudinary** – Store and manage pizza & ingredient images
+- 📑 **Detailed Order Insights** – Item-wise breakdown & customer details
 
 ---
 
@@ -100,10 +104,8 @@ cd client
 npm run dev
 ```
 **📽 Demo Video**
-🎥 Watch on YouTube: 
+🎥 Watch on YouTube: https://youtu.be/kVBiREJ6fEM?si=8E3j1CSoGESaYheB
 
-**📎 GitHub Repository**
-📂 View Source Code: 
 
 **💡 Learnings**
 Building a full-stack MERN app from scratch
